@@ -1,6 +1,6 @@
 const Order = require("../models/Order");
 const Product = require("../models/Product");
-const sendEmail = require("../utils/sendEmail");
+const { sendMail } = require("../services/emailService");
 
 // 🧾 Create order (customer checkout)
 const createOrder = async (req, res) => {
@@ -41,15 +41,15 @@ const createOrder = async (req, res) => {
 
     // send email confirmation (simple)
     try {
-      await sendEmail(
-        req.user.email,
-        "Order Placed Successfully",
-        `<h3>Hey ${req.user.name},</h3>
-         <p>Your order (#${order._id}) has been placed successfully!</p>
-         <p>Total Amount: ₹${total}</p>
-         <p>Payment Method: ${paymentMethod}</p>
-         <p>We’ll notify you once it’s shipped 🚚</p>`
-      );
+      await sendMail({
+        to: req.user.email,
+        subject: "Order Placed Successfully",
+        html: `<h3>Hey ${req.user.name},</h3>
+               <p>Your order (#${order._id}) has been placed successfully!</p>
+               <p>Total Amount: ₹${total}</p>
+               <p>Payment Method: ${paymentMethod}</p>
+               <p>We’ll notify you once it’s shipped 🚚</p>`
+      });
     } catch (e) {
       console.warn("Email send failed:", e.message);
     }
@@ -119,4 +119,5 @@ module.exports = {
   getAllOrders,
   updateOrderStatus,
   deleteOrder,
+  
 };

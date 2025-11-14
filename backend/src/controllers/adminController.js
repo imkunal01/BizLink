@@ -87,4 +87,21 @@ const getStats = async (req, res) => {
   }
 };
 
-module.exports = { getAllUsers, toggleBlockUser, updateUserRole, getStats , deleteUser};
+const getRetailerOrdersAdmin = async (req, res) => {
+  try {
+    const orders = await Order.find()
+      .populate("user", "name role email")
+      .populate("items.product", "name images")
+      .where("user.role")
+      .equals("retailer");
+
+    res.json({ success: true, data: orders });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+
+
+
+module.exports = { getAllUsers, toggleBlockUser, updateUserRole, getStats , deleteUser, getRetailerOrdersAdmin };

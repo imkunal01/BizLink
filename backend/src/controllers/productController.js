@@ -28,7 +28,7 @@ async function createProduct(req, res) {
       name,
       slug,
       description,
-      category: category || undefined,
+      Category: category || undefined,
       price,
       retailer_price,
       price_bulk,
@@ -62,11 +62,11 @@ async function listProducts(req, res) {
     const filter = { active: true };
 
     if (q) filter.$text = { $search: q };
-    if (category) filter.category = category;
+    if (category) filter.Category = category;
     if (min) filter.price = { ...(filter.price || {}), $gte: Number(min) };
     if (max) filter.price = { ...(filter.price || {}), $lte: Number(max) };
 
-    const skip = (Number(page) - 1) * Number(limit);``
+    const skip = (Number(page) - 1) * Number(limit);
     let query = Product.find(filter).populate("Category", "name slug");
     if (sort) query = query.sort(sort);
     query = query.skip(skip).limit(Number(limit));
@@ -168,11 +168,29 @@ async function removeImage(req, res) {
   }
 }
 
+async function getRetailerProducts(req, res) {
+  try {
+    // Ensures user is retailer
+    if (req.user.role !== "retailer") {
+      return res.status(403).json({ success: false, message: "Access denied" });
+    }
+
+    const products = await Product.find({ active: true })
+      .select("name images stock retailer_price price_bulk min_bulk_qty");
+
+    res.json({ success: true, data: products });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+
 module.exports = {
   createProduct,
   listProducts,
   getProduct,
   updateProduct,
   deleteProduct,
-  removeImage
+  removeImage,
+  getRetailerProducts
 };

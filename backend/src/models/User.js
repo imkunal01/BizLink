@@ -18,7 +18,8 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['customer', 'retailer','admin' ],
         default: 'customer'
-    }
+    },
+    isBlocked: { type: Boolean, default: false }
 }, { timestamps: true });
 
 userSchema.pre('save',async function (next){

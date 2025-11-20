@@ -1,0 +1,138 @@
+PHASE 1 DETAILED BLUEPRINT PROMPT (NO AXIOS FILE, NO GLOBAL CSS)
+You must generate Phase 1 of the Kripa Connect frontend exactly as defined below. Build the complete frontend foundation. Use React + Vite + Tailwind + shadcn UI + Redux Toolkit + RTK Query. Do not create a separate axios file. Use RTK Query with fetchBaseQuery for API base handling and token logic. Do not produce a large globals.css file. Keep styling component-level using Tailwind utility classes and shadcn components. Create minimal theme utilities only if strictly necessary. No backend integration data fetching should be implemented beyond RTK Query base scaffolding and placeholder hooks. All pages use placeholder content.
+Folder structure
+Create the following files and folders exactly:
+src/
+main.jsx
+App.jsx
+lib/
+theme.js
+constants.js
+components/
+layout/
+Navbar.jsx
+Footer.jsx
+SideNav.jsx
+ui/         (shadcn components go here)
+loaders/
+  PageLoader.jsx
+  SkeletonCard.jsx
+feedback/
+  ErrorBoundary.jsx
+layouts/
+RootLayout.jsx
+CustomerLayout.jsx
+RetailerLayout.jsx
+AdminLayout.jsx
+pages/
+Home/
+Home.jsx
+Auth/
+Login.jsx
+Register.jsx
+Products/
+Products.jsx
+Cart/
+Cart.jsx
+Admin/
+AdminDashboard.jsx
+Retailer/
+RetailerDashboard.jsx
+NotFound.jsx
+routes/
+index.jsx
+ProtectedRoute.jsx
+RoleBasedRoute.jsx
+store/
+index.js
+slices/
+authSlice.js
+uiSlice.js
+api/
+baseApi.js
+(no axios file; baseApi must use fetchBaseQuery)
+hooks/
+useAuth.js
+useTheme.js
+styles/
+tailwind.css (only the minimal Tailwind entry that imports @tailwind base/components/utilities)
+theme.css (optional and minimal; only root-level variables if absolutely needed)
+utils/
+storage.js
+roleUtils.js
+Project config files to generate
+tailwind.config.js configured with content paths to src/**/*.jsx and node_modules/shadcn if needed
+postcss.config.js
+vite.config.js with alias @/* → src/* and React fast refresh config
+package.json scripts sample (dev, build, preview)
+Tailwind and shadcn setup
+Include only the minimal Tailwind entry file named styles/tailwind.css that imports:
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+Do not create a large globals.css. Avoid heavy global variable usage.
+Use shadcn UI components in components/ui and keep styling per-component with Tailwind classes.
+If a tiny theme.css is created, it must only include very small root color variables and no complex global rules.
+Routing using React Router v6
+routes/index.jsx defines all routes, uses lazy(() => import(...)) for pages, wraps with Suspense fallback PageLoader.
+Routes to include: /, /login, /register, /products, /cart, /admin/dashboard (admin only), /retailer/dashboard (retailer only), /404
+Use RootLayout for top-level. CustomerLayout, RetailerLayout, AdminLayout used for role-based sections.
+ProtectedRoute and RoleBasedRoute
+ProtectedRoute.jsx reads isAuthenticated from authSlice to allow route or redirect to /login.
+RoleBasedRoute.jsx accepts allowedRoles array prop, checks authSlice.role, allows or redirects to /404. Keep logic simple and commented.
+Layouts
+RootLayout.jsx includes Navbar, Outlet, Footer, and page-level Framer Motion transitions for route changes.
+CustomerLayout.jsx, RetailerLayout.jsx, AdminLayout.jsx are minimal placeholders that render an Area container and Outlet. AdminLayout includes a simple SideNav placeholder.
+Keep layout styles applied with Tailwind utility classes inside the components (no global styles).
+shadcn UI components
+Generate base shadcn components: Button, Input, Card, Skeleton, Separator, DropdownMenu, Sheet.
+Place them in components/ui. Implement these using shadcn patterns and Tailwind utility classes.
+Keep components small and composable.
+Redux Toolkit setup
+store/index.js: configure store with authSlice and uiSlice and RTK Query middleware.
+Use redux-persist to persist auth slice only.
+authSlice initial state: { user: null, token: null, role: null, isAuthenticated: false }
+uiSlice initial state: { theme: "light", isSidebarOpen: false }
+Export typed hooks (useAppDispatch, useAppSelector) from store.
+RTK Query baseApi using fetchBaseQuery
+store/api/baseApi.js must export a createApi instance using fetchBaseQuery, not axios.
+baseQuery should read token from redux via a prepareHeaders callback.
+baseUrl set to "/api" for scaffolding.
+tagTypes: ["Auth", "Products", "Orders", "Users", "Retailer", "Admin"]
+Implement centralized handling for 401 within baseQuery or by using an onError handler that dispatches logout action. Do not create an axios file.
+Component-level fetching approach
+Do not create separate generic fetch utilities files for each component. Use RTK Query service endpoints when needed in later phases. For Phase 1 create only the baseApi skeleton and example placeholder query in baseApi or a sample productApi if required, but do not implement data fetching logic beyond an example. The pattern must allow fetching within the same domain file via RTK Query hooks so the fetch logic is colocated with the service, and UI components use the generated hooks directly. This keeps fetching logic near components while avoiding a global axios file.
+Theme handling without big global CSS
+hooks/useTheme.js toggles theme by adding/removing 'dark' class on document.documentElement.
+theme.js contains helpers only (setTheme, getTheme).
+Do not include heavy root variables. If needed, include two simple variables in theme.css for minimal tweaks.
+Page placeholders
+Home.jsx: display "Kripa Connect Frontend Setup Complete" using a Card and Button from shadcn.
+Login.jsx, Register.jsx: placeholder forms using shadcn Input and Button; use React Hook Form skeleton but no real submit.
+Products.jsx and Cart.jsx: simple lists with SkeletonCard placeholders.
+AdminDashboard.jsx and RetailerDashboard.jsx: "Coming soon" cards.
+NotFound.jsx: 404 message with button to navigate home.
+All pages should be lazy-loaded and wrapped with PageLoader fallback.
+Loaders and ErrorBoundary
+PageLoader.jsx: a simple full-screen loader component.
+SkeletonCard.jsx: skeleton UI for product placeholder.
+ErrorBoundary.jsx: basic error boundary component that displays a fallback UI and a retry button.
+Code-splitting and performance fundamentals
+All pages lazy loaded.
+Use Suspense boundaries with PageLoader.
+Use React.memo on small presentational components.
+Keep components small and single-responsibility.
+No heavy libraries beyond stated stack.
+Development ergonomics
+Add helpful console logs only in development mode.
+Add comments in code to explain auth flow points and where future API hooks will be added.
+Keep imports aliased as @/ (vite alias).
+Requirements and constraints
+Do not create a global axios file.
+Do not create a large globals.css file. Only a minimal tailwind.css import and optional tiny theme.css for root vars.
+Keep fetch logic colocated via RTK Query services (baseApi skeleton only in Phase 1).
+Use shadcn components and Tailwind utility classes for styling in components.
+All code must be clean, modular, readable, and follow the folder structure exactly.
+Use framer-motion for route transitions and small UI motion only.
+After generating all files for Phase 1, stop. Do not proceed to Phase 2.
+Start generation now.

@@ -48,11 +48,10 @@ const getRetailerOrdersAdmin = async (req, res) => {
   try {
     const orders = await Order.find()
       .populate("user", "name role email")
-      .populate("items.product", "name images price")
-      .where("user.role")
-      .equals("retailer");
+      .populate("items.product", "name images price");
 
-    res.json({ success: true, data: orders });
+    const retailerOrders = orders.filter((o) => o.user && o.user.role === "retailer");
+    res.json({ success: true, data: retailerOrders });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

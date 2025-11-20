@@ -21,4 +21,7 @@ const productSchema = new mongoose.Schema({
 }, { timestamps: true }
 );
 
+// enable text search for name/description/tags used by listProducts
+productSchema.index({ name: 'text', description: 'text', tags: 'text' });
+
 module.exports = mongoose.model('Product', productSchema);

@@ -64,14 +64,15 @@ const razorpayWebhook = async (req, res) => {
   try {
     const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
     const signature = req.headers["x-razorpay-signature"];
-    // Prefer raw body captured by express.json verify; fallback to parsed body
-    const body = req.rawBody || req.body;
+    const bodyRaw = (Buffer.isBuffer(req.body) || typeof req.body === "string")
+      ? req.body
+      : (req.rawBody ? req.rawBody : Buffer.from(JSON.stringify(req.body)));
 
     // compute expected signature: HMAC_SHA256(rawBody, webhookSecret)
     // When using express.raw({ type: 'application/json' }) in server, req.body is a Buffer/String raw
     const expectedSignature = crypto
       .createHmac("sha256", webhookSecret)
-      .update(body)
+      .update(bodyRaw)
       .digest("hex");
 
     if (expectedSignature !== signature) {
@@ -80,7 +81,7 @@ const razorpayWebhook = async (req, res) => {
     }
 
     // Parse payload (body as string -> JSON)
-    const payload = JSON.parse(Buffer.isBuffer(body) ? body.toString() : String(body));
+    const payload = JSON.parse(Buffer.isBuffer(bodyRaw) ? bodyRaw.toString() : bodyRaw);
 
     const event = payload.event;
     // console.log("razorpay webhook received:", event);

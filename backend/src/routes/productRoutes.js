@@ -3,7 +3,7 @@ const router = express.Router();
 const productController = require("../controllers/productController");
 const upload = require("../middleware/uploadMiddleware");
 const { protect, adminOnly } = require("../middleware/authMiddleware");
-const { createProductRules, updateProductRules, validate } = require('../validators/ProductValidator');;
+const { createProductRules, updateProductRules, validate } = require('../validators/ProductValidator');
 
 // Public listing and view
 router.get("/", productController.listProducts);

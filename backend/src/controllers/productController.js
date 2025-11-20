@@ -9,7 +9,7 @@ async function createProduct(req, res) {
     const {
       name,
       description,
-      category, // category id optional
+      category,
       price,
       retailer_price,
       price_bulk,
@@ -105,8 +105,10 @@ async function updateProduct(req, res) {
     }
 
     // other simple updates
-    const fields = ["description", "category", "price", "retailer_price", "price_bulk", "min_bulk_qty", "stock", "active"];
+    const fields = ["description", "price", "retailer_price", "price_bulk", "min_bulk_qty", "stock", "active"];
     fields.forEach(f => { if (updates[f] !== undefined) product[f] = updates[f]; });
+    if (updates.category !== undefined) product.Category = updates.category;
+    if (updates.Category !== undefined) product.Category = updates.Category;
 
     if (updates.tags) {
       product.tags = Array.isArray(updates.tags) ? updates.tags : updates.tags.split(",").map(t => t.trim());
@@ -182,7 +184,7 @@ async function getRetailerProducts(req, res) {
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
-};
+}
 
 
 module.exports = {

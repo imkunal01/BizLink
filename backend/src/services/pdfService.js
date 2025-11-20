@@ -15,7 +15,9 @@ async function generateInvoicePDF(order, user) {
 
       // file path (temporary)
       const fileName = `invoice_${order._id}.pdf`;
-      const filePath = path.join(__dirname, "../../temp", fileName);
+      const tempDir = path.join(__dirname, "../../temp");
+      try { fs.mkdirSync(tempDir, { recursive: true }); } catch (e) {}
+      const filePath = path.join(tempDir, fileName);
 
       const stream = fs.createWriteStream(filePath);
       doc.pipe(stream);

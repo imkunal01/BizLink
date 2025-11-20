@@ -11,13 +11,32 @@ connectDB();
 
 const app = express();
 
+const allowedOrigins = [
+  "http://localhost:3000",      // React web
+  "http://localhost:5173",      // Vite
+  "https://yourdomain.com"      // Production
+]
+
 // Normal body parser (JSON)
 app.use(express.json({
   verify: (req, res, buf) => { req.rawBody = buf; }
 }));
 
-app.use(cors());
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true
+}));
+
 app.use(morgan("dev"));
+
+app.use(helmet());         // Protects headers
+app.use(apiLimiter);       // Rate limiter
+app.use(xss());            // Prevent XSS
+app.use(sanitizeRequest);  // Prevent Mongo injection
+
 
 // ROUTES
 app.use("/api/auth", require("./routes/authRoutes"));
@@ -35,7 +54,7 @@ app.use("/api/retailer", require("./routes/retailerRoutes"));
   
 
 // HEALTH CHECK
-app.get("/Health", (req, res) => res.send("Smart E-Commerce Backend Running ✅"));
+app.get("/", (req, res) => res.send("Smart E-Commerce Backend Running ✅"));
 
 // ERROR HANDLER
 app.use(errorHandler);

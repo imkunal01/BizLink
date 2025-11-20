@@ -1,74 +1,74 @@
-const User = require('../models/User');
-const user = require('../models/User');
+const User = require("../models/User");
 
-// is function se sab user milenge except un logo password
-const getAllUsers = async (req,res)=>{
-    try{
-        const users = await user.find().select("-password");
-        res.json(users);
-    }
-    catch(err){
-        res.status(500).json({message: err.message});
-    }
+// Get all users (without password)
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find().select("-password");
+    res.json({ success: true, data: users });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
 };
 
-// ye block karne wala fucntion hai bc
-
+// Block / Unblock a user
 const toggleBlockUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
     user.isBlocked = !user.isBlocked;
     await user.save();
 
     res.json({
+      success: true,
       message: `User ${user.isBlocked ? "blocked" : "unblocked"} successfully`,
-      user,
+      data: user,
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// admin can update user role
+// Update user role
 const updateUserRole = async (req, res) => {
   try {
     const { role } = req.body;
-    const user = await User.findById(req.params.id);
 
-    if (!user) return res.status(404).json({ message: "User not found" });
-    if (!["customer", "retailer", "admin"].includes(role))
-      return res.status(400).json({ message: "Invalid role" });
+    if (!["customer", "retailer", "admin"].includes(role)) {
+      return res.status(400).json({ success: false, message: "Invalid role" });
+    }
+
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
     user.role = role;
     await user.save();
 
-    res.json({ message: "User role updated", user });
+    res.json({ success: true, message: "User role updated", data: user });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// 🗑️ Delete a User (Admin Only)
+// Delete a user
 const deleteUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
 
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
-    // prevent admin from deleting self
     if (user._id.toString() === req.user._id.toString()) {
-      return res.status(400).json({ message: "You can't delete yourself" });
+      return res.status(400).json({ success: false, message: "You can't delete yourself" });
     }
 
     await user.deleteOne();
-    res.json({ message: "User deleted successfully" });
+    res.json({ success: true, message: "User deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
+// Admin basic stats
 const getStats = async (req, res) => {
   try {
     const totalUsers = await User.countDocuments();
@@ -77,31 +77,23 @@ const getStats = async (req, res) => {
     const blockedUsers = await User.countDocuments({ isBlocked: true });
 
     res.json({
-      totalUsers,
-      totalRetailers,
-      totalCustomers,
-      blockedUsers,
+      success: true,
+      data: {
+        totalUsers,
+        totalRetailers,
+        totalCustomers,
+        blockedUsers,
+      },
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-const getRetailerOrdersAdmin = async (req, res) => {
-  try {
-    const orders = await Order.find()
-      .populate("user", "name role email")
-      .populate("items.product", "name images")
-      .where("user.role")
-      .equals("retailer");
-
-    res.json({ success: true, data: orders });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
+module.exports = {
+  getAllUsers,
+  toggleBlockUser,
+  updateUserRole,
+  deleteUser,
+  getStats,
 };
-
-
-
-
-module.exports = { getAllUsers, toggleBlockUser, updateUserRole, getStats , deleteUser, getRetailerOrdersAdmin };

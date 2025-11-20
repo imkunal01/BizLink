@@ -13,26 +13,21 @@ const createOrder = async (req, res) => {
 
     // calculate total
     let total = 0;
+    const orderItems = [];
     for (let item of items) {
       const product = await Product.findById(item.product);
       if (!product) return res.status(404).json({ message: "Product not found" });
-      if (product.stock < item.qty)
-        return res.status(400).json({ message: `${product.name} is out of stock` });
+      if (product.stock < item.qty) return res.status(400).json({ message: `${product.name} is out of stock` });
 
       total += item.qty * product.price;
-      // reduce stock
+      orderItems.push({ product: product._id, name: product.name, qty: item.qty, price: product.price });
       product.stock -= item.qty;
       await product.save();
     }
 
     const order = await Order.create({
       user: req.user._id,
-      items: items.map((i) => ({
-        product: i.product,
-        name: i.name,
-        qty: i.qty,
-        price: i.price,
-      })),
+      items: orderItems,
       totalAmount: total,
       paymentMethod: paymentMethod || "COD",
       paymentStatus: paymentMethod === "COD" ? "pending" : "pending",
@@ -45,10 +40,10 @@ const createOrder = async (req, res) => {
         to: req.user.email,
         subject: "Order Placed Successfully",
         html: `<h3>Hey ${req.user.name},</h3>
-               <p>Your order (#${order._id}) has been placed successfully!</p>
-               <p>Total Amount: ₹${total}</p>
-               <p>Payment Method: ${paymentMethod}</p>
-               <p>We’ll notify you once it’s shipped 🚚</p>`
+         <p>Your order (#${order._id}) has been placed successfully!</p>
+         <p>Total Amount: ₹${total}</p>
+         <p>Payment Method: ${paymentMethod}</p>
+         <p>We’ll notify you once it’s shipped 🚚</p>`
       });
     } catch (e) {
       console.warn("Email send failed:", e.message);
@@ -119,5 +114,4 @@ module.exports = {
   getAllOrders,
   updateOrderStatus,
   deleteOrder,
-  
 };

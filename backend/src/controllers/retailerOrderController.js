@@ -32,6 +32,7 @@ exports.createRetailerOrder = async (req, res) => {
       }
 
       item.price = perUnitPrice;
+      item.name = product.name;
       total += perUnitPrice * item.qty;
 
       // reduce stock

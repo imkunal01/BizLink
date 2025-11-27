@@ -1,6 +1,5 @@
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
-const xss = require("xss-clean");
 const mongoSanitize = require("mongo-sanitize");
 
 // Rate Limiter (Prevent DDoS / brute force)
@@ -15,15 +14,14 @@ const apiLimiter = rateLimit({
 
 // Input Sanitization
 const sanitizeRequest = (req, res, next) => {
-  req.body = mongoSanitize(req.body);
-  req.query = mongoSanitize(req.query);
-  req.params = mongoSanitize(req.params);
+  if (req.body) mongoSanitize(req.body);
+  if (req.query) mongoSanitize(req.query);
+  if (req.params) mongoSanitize(req.params);
   next();
 };
 
 module.exports = {
   helmet,
   apiLimiter,
-  xss,
   sanitizeRequest,
 };

@@ -1,6 +1,6 @@
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
-const dotevn = require('dotenv');
+
 const registerUser = async (req, res)=>{
     try {
         const { name, email, password, role } = req.body;
@@ -69,4 +69,3 @@ const getUserProfile = async (req, res) => {
 
 
 module.exports = { registerUser, loginUser, getUserProfile };
-

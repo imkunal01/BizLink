@@ -2,9 +2,10 @@ const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const morgan = require("morgan");
+const xss = require("xss");
 const connectDB = require("./config/db");
 const errorHandler = require("./middleware/errorHandler");
-const { helmet, apiLimiter, xss, sanitizeRequest } = require("./middleware/security");
+const { helmet, apiLimiter, sanitizeRequest } = require("./middleware/security");
 
 dotenv.config();
 connectDB();
@@ -14,6 +15,7 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:3000",      // React web
   "http://localhost:5173",      // Vite
+  "http://localhost:5174",      // Vite
   "https://yourdomain.com"      // Production
 ]
 
@@ -34,7 +36,14 @@ app.use(morgan("dev"));
 
 app.use(helmet());         // Protects headers
 app.use(apiLimiter);       // Rate limiter
-app.use(xss());            // Prevent XSS
+app.use((req, res, next) => {
+  if (req.body) {
+    try {
+      req.body = JSON.parse(xss(JSON.stringify(req.body)));
+    } catch (_) {}
+  }
+  next();
+});
 app.use(sanitizeRequest);  // Prevent Mongo injection
 
 

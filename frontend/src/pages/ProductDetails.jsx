@@ -56,41 +56,316 @@ export default function ProductDetails() {
     setReviews(r)
   }
 
+  const [selectedImage, setSelectedImage] = useState(images[0]?.url || null)
+
   return (
-    <div>
+    <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb' }}>
       <Navbar />
-      <div style={{ padding: 24, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
-        <div>
-          <div style={{ height: 360, background: '#f8fafc', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {images[0]?.url ? <img src={images[0].url} alt={product.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} /> : null}
+      <div style={{
+        maxWidth: '1280px',
+        margin: '0 auto',
+        padding: '1rem'
+      }}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr',
+          gap: '1.5rem',
+          backgroundColor: 'white',
+          borderRadius: '0.75rem',
+          padding: '1rem',
+          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+          marginBottom: '1.5rem'
+        }} className="product-details-grid">
+          {/* Image Gallery */}
+          <div>
+            <div style={{
+              height: '300px',
+              background: '#f9fafb',
+              borderRadius: '0.75rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: '1rem',
+              overflow: 'hidden',
+              border: '1px solid #e5e7eb'
+            }} className="product-image-main">
+              {selectedImage ? (
+                <img
+                  src={selectedImage}
+                  alt={product.name}
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    objectFit: 'contain'
+                  }}
+                />
+              ) : (
+                <span style={{ fontSize: '4rem', opacity: 0.3 }}>📦</span>
+              )}
+            </div>
+            {images.length > 1 && (
+              <div style={{
+                display: 'flex',
+                gap: '0.75rem',
+                overflowX: 'auto',
+                paddingBottom: '0.5rem'
+              }}>
+                {images.map((img, idx) => (
+                  <img
+                    key={idx}
+                    src={img.url}
+                    alt={`${product.name} ${idx + 1}`}
+                    onClick={() => setSelectedImage(img.url)}
+                    style={{
+                      width: '80px',
+                      height: '80px',
+                      objectFit: 'cover',
+                      borderRadius: '0.5rem',
+                      border: selectedImage === img.url ? '2px solid #2563eb' : '1px solid #e5e7eb',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      flexShrink: 0
+                    }}
+                    onMouseEnter={(e) => {
+                      if (selectedImage !== img.url) {
+                        e.currentTarget.style.borderColor = '#2563eb'
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (selectedImage !== img.url) {
+                        e.currentTarget.style.borderColor = '#e5e7eb'
+                      }
+                    }}
+                  />
+                ))}
+              </div>
+            )}
           </div>
-          <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-            {images.slice(0,4).map((img, idx) => (
-              <img key={idx} src={img.url} alt={String(idx)} style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 8, border: '1px solid #e2e8f0' }} />
-            ))}
-          </div>
-        </div>
-        <div>
-          <h2 style={{ margin: 0 }}>{product.name}</h2>
-          <div style={{ marginTop: 6 }}>₹{product.price}</div>
-          <div style={{ marginTop: 6, fontSize: 12 }}>{inStock ? 'In Stock' : 'Out of Stock'}</div>
-          <div style={{ marginTop: 12 }}>{product.description}</div>
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginTop: 16 }}>
-            <QuantitySelector value={qty} max={product.stock || 1} onChange={setQty} />
-            <button className="nav-btn signup-btn" disabled={!inStock} onClick={() => addToCart(product, qty)}>Add to Cart</button>
-            <button className="nav-btn" disabled={!inStock} onClick={async () => { await addToCart(product, qty); navigate('/checkout') }}>Buy Now</button>
-            <FavoritesButton productId={product._id} active={favorites.includes(product._id)} />
-          </div>
-          <div style={{ marginTop: 24 }}>
-            <h3 style={{ marginBottom: 8 }}>Reviews</h3>
-            <ReviewList items={reviews} />
-            <div style={{ marginTop: 12 }}>
-              <ReviewForm onSubmit={submitReview} />
+
+          {/* Product Info */}
+          <div>
+            <h1 style={{
+              fontSize: '1.5rem',
+              fontWeight: '700',
+              marginBottom: '1rem',
+              color: '#111827',
+              lineHeight: '1.3'
+            }} className="product-title">
+              {product.name}
+            </h1>
+
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '1rem',
+              marginBottom: '1.5rem',
+              paddingBottom: '1.5rem',
+              borderBottom: '1px solid #e5e7eb'
+            }}>
+              <div style={{
+                fontSize: '2rem',
+                fontWeight: '700',
+                color: '#2563eb'
+              }}>
+                ₹{product.price?.toLocaleString('en-IN')}
+              </div>
+              <div style={{
+                padding: '0.375rem 0.75rem',
+                backgroundColor: inStock ? '#d1fae5' : '#fee2e2',
+                color: inStock ? '#065f46' : '#991b1b',
+                borderRadius: '0.375rem',
+                fontSize: '0.875rem',
+                fontWeight: '600'
+              }}>
+                {inStock ? `In Stock (${product.stock})` : 'Out of Stock'}
+              </div>
+            </div>
+
+            {product.description && (
+              <div style={{
+                marginBottom: '2rem',
+                color: '#4b5563',
+                lineHeight: '1.6',
+                fontSize: '1rem'
+              }}>
+                {product.description}
+              </div>
+            )}
+
+            {/* Quantity and Actions */}
+            <div style={{
+              marginBottom: '2rem',
+              padding: '1.5rem',
+              backgroundColor: '#f9fafb',
+              borderRadius: '0.75rem',
+              border: '1px solid #e5e7eb'
+            }}>
+              <div style={{
+                marginBottom: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem'
+              }}>
+                <label style={{
+                  fontSize: '0.875rem',
+                  fontWeight: '600',
+                  color: '#374151'
+                }}>
+                  Quantity:
+                </label>
+                <QuantitySelector value={qty} max={product.stock || 1} onChange={setQty} />
+              </div>
+
+              <div style={{
+                display: 'flex',
+                gap: '0.75rem',
+                marginBottom: '1rem'
+              }}>
+                <button
+                  onClick={() => addToCart(product, qty)}
+                  disabled={!inStock}
+                  style={{
+                    flex: 1,
+                    padding: '0.875rem 1.5rem',
+                    backgroundColor: inStock ? '#2563eb' : '#9ca3af',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '0.5rem',
+                    fontWeight: '600',
+                    fontSize: '1rem',
+                    cursor: inStock ? 'pointer' : 'not-allowed',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (inStock) {
+                      e.currentTarget.style.backgroundColor = '#1e40af'
+                      e.currentTarget.style.transform = 'scale(1.02)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (inStock) {
+                      e.currentTarget.style.backgroundColor = '#2563eb'
+                      e.currentTarget.style.transform = 'scale(1)'
+                    }
+                  }}
+                >
+                  Add to Cart
+                </button>
+                <button
+                  onClick={async () => {
+                    await addToCart(product, qty)
+                    navigate('/checkout')
+                  }}
+                  disabled={!inStock}
+                  style={{
+                    flex: 1,
+                    padding: '0.875rem 1.5rem',
+                    backgroundColor: inStock ? '#10b981' : '#9ca3af',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '0.5rem',
+                    fontWeight: '600',
+                    fontSize: '1rem',
+                    cursor: inStock ? 'pointer' : 'not-allowed',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (inStock) {
+                      e.currentTarget.style.backgroundColor = '#059669'
+                      e.currentTarget.style.transform = 'scale(1.02)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (inStock) {
+                      e.currentTarget.style.backgroundColor = '#10b981'
+                      e.currentTarget.style.transform = 'scale(1)'
+                    }
+                  }}
+                >
+                  Buy Now
+                </button>
+              </div>
+
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <FavoritesButton productId={product._id} active={favorites.includes(product._id)} />
+              </div>
+            </div>
+
+            {/* Key Features */}
+            <div style={{
+              padding: '1.5rem',
+              backgroundColor: '#f0fdf4',
+              borderRadius: '0.75rem',
+              border: '1px solid #bbf7d0'
+            }}>
+              <h3 style={{
+                fontSize: '1rem',
+                fontWeight: '600',
+                marginBottom: '0.75rem',
+                color: '#166534'
+              }}>
+                Key Features
+              </h3>
+              <ul style={{
+                listStyle: 'none',
+                padding: 0,
+                margin: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.5rem'
+              }}>
+                <li style={{ color: '#166534', fontSize: '0.875rem' }}>✓ Fast & Secure Delivery</li>
+                <li style={{ color: '#166534', fontSize: '0.875rem' }}>✓ Genuine Products Guaranteed</li>
+                <li style={{ color: '#166534', fontSize: '0.875rem' }}>✓ Easy Returns & Exchanges</li>
+              </ul>
             </div>
           </div>
         </div>
+
+        {/* Reviews Section */}
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '0.75rem',
+          padding: '2rem',
+          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
+        }}>
+          <h2 style={{
+            fontSize: '1.5rem',
+            fontWeight: '700',
+            marginBottom: '1.5rem',
+            color: '#111827'
+          }}>
+            Customer Reviews
+          </h2>
+          <ReviewList items={reviews} />
+          {token && (
+            <div style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '1px solid #e5e7eb' }}>
+              <ReviewForm onSubmit={submitReview} />
+            </div>
+          )}
+        </div>
       </div>
       <Footer />
+      
+      <style>{`
+        @media (min-width: 768px) {
+          .product-details-grid {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 3rem !important;
+            padding: 2rem !important;
+          }
+          .product-image-main {
+            height: 500px !important;
+          }
+          .product-title {
+            font-size: 2rem !important;
+          }
+        }
+      `}</style>
     </div>
   )
 }

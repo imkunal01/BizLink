@@ -136,22 +136,35 @@ export default function ProfilePage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#f9fafb' }}>
       <Navbar />
       
-      <main style={{ flex: 1, padding: '40px 20px', maxWidth: '800px', margin: '0 auto', width: '100%' }}>
-        <div style={{ marginBottom: '30px' }}>
-          <h1 style={{ fontSize: '32px', marginBottom: '10px' }}>My Profile</h1>
-          <p style={{ color: '#666' }}>Manage your account settings and information</p>
+      <main style={{ flex: 1, padding: '1rem', maxWidth: '900px', margin: '0 auto', width: '100%' }}>
+        <div style={{ marginBottom: '1.5rem' }}>
+          <h1 style={{
+            fontSize: '1.5rem',
+            fontWeight: '700',
+            marginBottom: '0.5rem',
+            color: '#111827'
+          }}>
+            My Profile
+          </h1>
+          <p style={{
+            color: '#6b7280',
+            fontSize: '0.875rem'
+          }}>
+            Manage your account settings and information
+          </p>
         </div>
 
         {error && (
           <div style={{ 
-            padding: '12px 16px', 
-            backgroundColor: '#fee', 
-            color: '#c33', 
-            borderRadius: '8px', 
-            marginBottom: '20px' 
+            padding: '1rem 1.25rem', 
+            backgroundColor: '#fee2e2', 
+            color: '#991b1b', 
+            borderRadius: '0.5rem', 
+            marginBottom: '1.5rem',
+            border: '1px solid #fecaca'
           }}>
             {error}
           </div>
@@ -159,24 +172,34 @@ export default function ProfilePage() {
 
         {success && (
           <div style={{ 
-            padding: '12px 16px', 
-            backgroundColor: '#efe', 
-            color: '#3c3', 
-            borderRadius: '8px', 
-            marginBottom: '20px' 
+            padding: '1rem 1.25rem', 
+            backgroundColor: '#d1fae5', 
+            color: '#065f46', 
+            borderRadius: '0.5rem', 
+            marginBottom: '1.5rem',
+            border: '1px solid #bbf7d0'
           }}>
             {success}
           </div>
         )}
 
         <div style={{ 
-          backgroundColor: '#fff', 
-          borderRadius: '12px', 
-          padding: '30px', 
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-          marginBottom: '30px'
+          backgroundColor: 'white', 
+          borderRadius: '0.75rem', 
+          padding: '1.5rem', 
+          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+          border: '1px solid #e5e7eb',
+          marginBottom: '1.5rem'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '30px', gap: '20px', flexWrap: 'wrap' }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            marginBottom: '2rem',
+            gap: '1.5rem',
+            flexWrap: 'wrap',
+            paddingBottom: '2rem',
+            borderBottom: '1px solid #e5e7eb'
+          }}>
             <div style={{ position: 'relative' }}>
               <img
                 src={photoPreview || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&size=120&background=random`}
@@ -186,7 +209,8 @@ export default function ProfilePage() {
                   height: '120px',
                   borderRadius: '50%',
                   objectFit: 'cover',
-                  border: '3px solid #e2e8f0'
+                  border: '4px solid #e5e7eb',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                 }}
               />
               {editing && (
@@ -218,16 +242,29 @@ export default function ProfilePage() {
               )}
             </div>
             <div style={{ flex: 1 }}>
-              <h2 style={{ fontSize: '24px', marginBottom: '5px' }}>{user.name}</h2>
-              <p style={{ color: '#666', marginBottom: '5px' }}>{user.email}</p>
+              <h2 style={{
+                fontSize: '1.5rem',
+                fontWeight: '700',
+                marginBottom: '0.5rem',
+                color: '#111827'
+              }}>
+                {user.name}
+              </h2>
+              <p style={{
+                color: '#6b7280',
+                marginBottom: '0.75rem',
+                fontSize: '1rem'
+              }}>
+                {user.email}
+              </p>
               <span style={{
                 display: 'inline-block',
-                padding: '4px 12px',
-                backgroundColor: user.role === 'retailer' ? '#dbeafe' : '#f0fdf4',
-                color: user.role === 'retailer' ? '#1e40af' : '#166534',
-                borderRadius: '12px',
-                fontSize: '14px',
-                fontWeight: '500'
+                padding: '0.375rem 0.75rem',
+                backgroundColor: user.role === 'retailer' ? '#dbeafe' : '#d1fae5',
+                color: user.role === 'retailer' ? '#1e40af' : '#065f46',
+                borderRadius: '0.5rem',
+                fontSize: '0.875rem',
+                fontWeight: '600'
               }}>
                 {user.role === 'retailer' ? 'Retailer' : 'Customer'}
               </span>
@@ -296,22 +333,41 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div style={{ marginTop: '30px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <div style={{
+            marginTop: '2rem',
+            paddingTop: '2rem',
+            borderTop: '1px solid #e5e7eb',
+            display: 'flex',
+            gap: '0.75rem',
+            flexWrap: 'wrap'
+          }}>
             {editing ? (
               <>
                 <button
                   onClick={handleSave}
                   disabled={saving}
                   style={{
-                    padding: '12px 24px',
-                    backgroundColor: '#3b82f6',
+                    padding: '0.875rem 1.5rem',
+                    backgroundColor: saving ? '#9ca3af' : '#2563eb',
                     color: '#fff',
                     border: 'none',
-                    borderRadius: '6px',
-                    fontSize: '16px',
-                    fontWeight: '500',
+                    borderRadius: '0.5rem',
+                    fontSize: '1rem',
+                    fontWeight: '600',
                     cursor: saving ? 'not-allowed' : 'pointer',
-                    opacity: saving ? 0.5 : 1
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!saving) {
+                      e.currentTarget.style.backgroundColor = '#1e40af'
+                      e.currentTarget.style.transform = 'scale(1.02)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!saving) {
+                      e.currentTarget.style.backgroundColor = '#2563eb'
+                      e.currentTarget.style.transform = 'scale(1)'
+                    }
                   }}
                 >
                   {saving ? 'Saving...' : 'Save Changes'}
@@ -325,66 +381,102 @@ export default function ProfilePage() {
                   }}
                   disabled={saving}
                   style={{
-                    padding: '12px 24px',
-                    backgroundColor: '#e5e7eb',
+                    padding: '0.875rem 1.5rem',
+                    backgroundColor: '#f3f4f6',
                     color: '#374151',
-                    border: 'none',
-                    borderRadius: '6px',
-                    fontSize: '16px',
-                    fontWeight: '500',
-                    cursor: 'pointer'
+                    border: '1px solid #d1d5db',
+                    borderRadius: '0.5rem',
+                    fontSize: '1rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#e5e7eb'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#f3f4f6'
                   }}
                 >
                   Cancel
                 </button>
               </>
             ) : (
-              <button
-                onClick={() => setEditing(true)}
-                style={{
-                  padding: '12px 24px',
-                  backgroundColor: '#3b82f6',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '16px',
-                  fontWeight: '500',
-                  cursor: 'pointer'
-                }}
-              >
-                Edit Profile
-              </button>
+              <>
+                <button
+                  onClick={() => setEditing(true)}
+                  style={{
+                    padding: '0.875rem 1.5rem',
+                    backgroundColor: '#2563eb',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '0.5rem',
+                    fontSize: '1rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#1e40af'
+                    e.currentTarget.style.transform = 'scale(1.02)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#2563eb'
+                    e.currentTarget.style.transform = 'scale(1)'
+                  }}
+                >
+                  Edit Profile
+                </button>
+                <button
+                  onClick={() => navigate('/orders')}
+                  style={{
+                    padding: '0.875rem 1.5rem',
+                    backgroundColor: '#10b981',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '0.5rem',
+                    fontSize: '1rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#059669'
+                    e.currentTarget.style.transform = 'scale(1.02)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#10b981'
+                    e.currentTarget.style.transform = 'scale(1)'
+                  }}
+                >
+                  View Orders
+                </button>
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    padding: '0.875rem 1.5rem',
+                    backgroundColor: '#ef4444',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '0.5rem',
+                    fontSize: '1rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#dc2626'
+                    e.currentTarget.style.transform = 'scale(1.02)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#ef4444'
+                    e.currentTarget.style.transform = 'scale(1)'
+                  }}
+                >
+                  Logout
+                </button>
+              </>
             )}
-            <button
-              onClick={() => navigate('/orders')}
-              style={{
-                padding: '12px 24px',
-                backgroundColor: '#10b981',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '6px',
-                fontSize: '16px',
-                fontWeight: '500',
-                cursor: 'pointer'
-              }}
-            >
-              View Orders
-            </button>
-            <button
-              onClick={handleLogout}
-              style={{
-                padding: '12px 24px',
-                backgroundColor: '#ef4444',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '6px',
-                fontSize: '16px',
-                fontWeight: '500',
-                cursor: 'pointer'
-              }}
-            >
-              Logout
-            </button>
           </div>
         </div>
       </main>

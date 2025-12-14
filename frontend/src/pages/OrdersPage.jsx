@@ -75,10 +75,10 @@ export default function OrdersPage() {
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
       
-      <main style={{ flex: 1, padding: '40px 20px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
-        <div style={{ marginBottom: '30px' }}>
-          <h1 style={{ fontSize: '32px', marginBottom: '10px' }}>My Orders</h1>
-          <p style={{ color: '#666' }}>View and track your order history</p>
+      <main style={{ flex: 1, padding: '1rem', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
+        <div style={{ marginBottom: '1.5rem' }}>
+          <h1 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', fontWeight: '700', color: '#111827' }}>My Orders</h1>
+          <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>View and track your order history</p>
         </div>
 
         {error && (
@@ -129,11 +129,12 @@ export default function OrdersPage() {
                   key={order._id}
                   style={{
                     backgroundColor: '#fff',
-                    borderRadius: '12px',
-                    padding: '24px',
+                    borderRadius: '0.75rem',
+                    padding: '1rem',
                     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
                     cursor: 'pointer',
-                    transition: 'transform 0.2s, box-shadow 0.2s'
+                    transition: 'transform 0.2s, box-shadow 0.2s',
+                    border: '1px solid #e5e7eb'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translateY(-2px)'
@@ -206,6 +207,24 @@ export default function OrdersPage() {
       </main>
 
       <Footer />
+      
+      <style>{`
+        @media (min-width: 768px) {
+          main {
+            padding: 2.5rem 1.25rem !important;
+          }
+          h1 {
+            font-size: 2rem !important;
+            margin-bottom: 0.625rem !important;
+          }
+          p {
+            font-size: 1rem !important;
+          }
+          .order-card {
+            padding: 1.5rem !important;
+          }
+        }
+      `}</style>
     </div>
   )
 }

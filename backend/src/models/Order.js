@@ -42,6 +42,7 @@ const orderSchema = new mongoose.Schema(
       amount: Number,
     },
     invoiceUrl: { type: String, default: null },
+    isBulkOrder: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

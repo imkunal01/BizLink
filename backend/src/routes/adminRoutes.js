@@ -15,6 +15,7 @@ router.get("/stats", protect, adminOnly, adminController.getStats);
 
 // ORDER MANAGEMENT
 router.get("/orders", protect, adminOnly, adminOrderController.getAllOrdersAdmin);
+router.get("/orders/:id", protect, adminOnly, adminOrderController.getOrderByIdAdmin);
 router.get("/retailer-orders", protect, adminOnly, adminOrderController.getRetailerOrdersAdmin);
 router.put("/orders/status/:id", protect, adminOnly, adminOrderController.updateOrderStatusAdmin);
 router.delete("/orders/:id", protect, adminOnly, adminOrderController.deleteOrderAdmin);

@@ -21,7 +21,18 @@ export function ShopProvider({ children }) {
     if (token) {
       await apiAddToCart(product._id, qty, token)
       const items = await getCart(token)
-      setCart(items.map(i => ({ productId: i.product, name: i.name, price: i.price, image: i.image, qty: i.qty })))
+      setCart(items.map(i => ({ 
+        productId: i.product, 
+        name: i.name, 
+        price: i.price, 
+        image: i.image, 
+        qty: i.qty,
+        regularPrice: i.regularPrice,
+        retailerPrice: i.retailerPrice,
+        bulkPrice: i.bulkPrice,
+        minBulkQty: i.minBulkQty,
+        isBulkPrice: i.isBulkPrice
+      })))
     } else {
       setCart(prev => {
         const idx = prev.findIndex(i => i.productId === product._id)
@@ -39,7 +50,18 @@ export function ShopProvider({ children }) {
     if (token) {
       await removeCartItem(productId, token)
       const items = await getCart(token)
-      setCart(items.map(i => ({ productId: i.product, name: i.name, price: i.price, image: i.image, qty: i.qty })))
+      setCart(items.map(i => ({ 
+        productId: i.product, 
+        name: i.name, 
+        price: i.price, 
+        image: i.image, 
+        qty: i.qty,
+        regularPrice: i.regularPrice,
+        retailerPrice: i.retailerPrice,
+        bulkPrice: i.bulkPrice,
+        minBulkQty: i.minBulkQty,
+        isBulkPrice: i.isBulkPrice
+      })))
     } else {
       setCart(prev => prev.filter(i => i.productId !== productId))
     }
@@ -49,7 +71,18 @@ export function ShopProvider({ children }) {
     if (token) {
       await updateCartItem(productId, qty, token)
       const items = await getCart(token)
-      setCart(items.map(i => ({ productId: i.product, name: i.name, price: i.price, image: i.image, qty: i.qty })))
+      setCart(items.map(i => ({ 
+        productId: i.product, 
+        name: i.name, 
+        price: i.price, 
+        image: i.image, 
+        qty: i.qty,
+        regularPrice: i.regularPrice,
+        retailerPrice: i.retailerPrice,
+        bulkPrice: i.bulkPrice,
+        minBulkQty: i.minBulkQty,
+        isBulkPrice: i.isBulkPrice
+      })))
     } else {
       setCart(prev => prev.map(i => i.productId === productId ? { ...i, qty } : i))
     }
@@ -72,7 +105,18 @@ export function ShopProvider({ children }) {
     ;(async () => {
       const [favItems, cartItems] = await Promise.all([listFavorites(token), getCart(token)])
       setFavorites(favItems.map(p => p._id))
-      setCart(cartItems.map(i => ({ productId: i.product, name: i.name, price: i.price, image: i.image, qty: i.qty })))
+      setCart(cartItems.map(i => ({ 
+        productId: i.product, 
+        name: i.name, 
+        price: i.price, 
+        image: i.image, 
+        qty: i.qty,
+        regularPrice: i.regularPrice,
+        retailerPrice: i.retailerPrice,
+        bulkPrice: i.bulkPrice,
+        minBulkQty: i.minBulkQty,
+        isBulkPrice: i.isBulkPrice
+      })))
     })()
   }, [token])
 

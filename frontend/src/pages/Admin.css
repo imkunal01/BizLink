@@ -1,2 +1,16 @@
 .admin { padding: 24px; }
 
+/* Admin Panel Styles */
+.admin-sidebar {
+  background-color: #1f2937;
+  color: #fff;
+}
+
+.admin-nav-item {
+  transition: all 0.2s;
+}
+
+.admin-nav-item:hover {
+  background-color: #374151;
+}
+

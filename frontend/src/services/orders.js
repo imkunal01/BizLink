@@ -9,3 +9,8 @@ export async function getMyOrders(token) {
   return res.data || []
 }
 
+export async function getOrderById(orderId, token) {
+  const res = await apiFetch(`/api/orders/${orderId}`, { token })
+  return res.data
+}
+

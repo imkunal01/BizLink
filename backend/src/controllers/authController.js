@@ -79,9 +79,52 @@ const loginUser = async (req, res)=>{
 
 const getUserProfile = async (req, res) => {
     try {
-        const user = await User.findById(req.user.id).select("-password");
+        const user = await User.findById(req.user._id).select("-password");
         if (user) res.json(user);
         else res.status(404).json({ message: "User not found" });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const updateProfile = async (req, res) => {
+    try {
+        const { name, phone } = req.body;
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        
+        if (name) user.name = name;
+        if (phone !== undefined) user.phone = phone;
+        
+        await user.save();
+        const updatedUser = await User.findById(user._id).select("-password");
+        res.json(updatedUser);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const uploadProfilePhoto = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: "No file uploaded" });
+        }
+        
+        const { uploadBuffer } = require('../services/cloudinaryService');
+        const { url } = await uploadBuffer(req.file.buffer, 'ecom_profiles');
+        
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        
+        user.profilePhoto = url;
+        await user.save();
+        
+        const updatedUser = await User.findById(user._id).select("-password");
+        res.json(updatedUser);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -167,4 +210,4 @@ const googleAuth = async (req, res) => {
     }
 }
 
-module.exports = { registerUser, loginUser, getUserProfile, logoutUser, refreshAccessToken, googleAuth };
+module.exports = { registerUser, loginUser, getUserProfile, updateProfile, uploadProfilePhoto, logoutUser, refreshAccessToken, googleAuth };

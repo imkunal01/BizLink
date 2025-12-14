@@ -44,5 +44,30 @@ async function create(req, res) {
   }
 }
 
-module.exports = { listByProduct, create };
+// Get all reviews (admin)
+async function getAllReviews(req, res) {
+  try {
+    const reviews = await Review.find()
+      .populate("user", "name email")
+      .populate("product", "name images")
+      .sort({ createdAt: -1 });
+    res.json({ success: true, data: reviews });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+}
+
+// Delete review (admin)
+async function deleteReview(req, res) {
+  try {
+    const review = await Review.findById(req.params.id);
+    if (!review) return res.status(404).json({ success: false, message: "Review not found" });
+    await review.deleteOne();
+    res.json({ success: true, message: "Review deleted" });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+}
+
+module.exports = { listByProduct, create, getAllReviews, deleteReview };
 

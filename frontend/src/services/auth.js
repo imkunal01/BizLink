@@ -19,3 +19,32 @@ export async function refresh() {
 export async function profile(token) {
   return apiFetch('/api/auth/profile', { token })
 }
+
+export async function updateProfile(data, token) {
+  return apiFetch('/api/auth/profile', { method: 'PUT', body: data, token })
+}
+
+export async function uploadProfilePhoto(file, token) {
+  const formData = new FormData()
+  formData.append('photo', file)
+  
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
+  const res = await fetch(`${BASE_URL}/api/auth/profile/photo`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    credentials: 'include',
+    mode: 'cors',
+    body: formData,
+  })
+  
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({ message: 'Upload failed' }))
+    const error = new Error(data.message || 'Upload failed')
+    error.status = res.status
+    throw error
+  }
+  
+  return { ok: true, status: res.status, data: await res.json() }
+}

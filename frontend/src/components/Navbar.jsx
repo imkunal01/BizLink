@@ -34,13 +34,24 @@ export default function Navbar() {
         <button className="nav-btn" onClick={() => navigate(-1)}>Back</button>
         <Link className="nav-btn" to="/categories">Categories</Link>
         {role === 'retailer' && <Link className="nav-btn" to="/b2b">B2B</Link>}
+        {role === 'admin' && <Link className="nav-btn" to="/admin">Admin</Link>}
         <Link className="nav-btn" to="/favorites">Favorites</Link>
         <Link className="nav-btn" to="/cart">Cart ({Array.isArray(cart) ? cart.reduce((n,i)=>n+Number(i.qty||0),0) : 0})</Link>
         <button className="nav-btn" onClick={() => setMenuOpen(!menuOpen)}>☰</button>
         {user ? (
           <>
+            <Link className="nav-btn" to="/orders">Orders</Link>
+            <Link className="nav-btn" to="/profile">Profile</Link>
             <span className="welcome-text">Hi, {user.name}</span>
-            <button className="nav-btn logout-btn" onClick={signOut}>Logout</button>
+            <button 
+              className="nav-btn logout-btn" 
+              onClick={async () => {
+                await signOut()
+                navigate('/login')
+              }}
+            >
+              Logout
+            </button>
           </>
         ) : (
           <>
@@ -56,11 +67,20 @@ export default function Navbar() {
             <Link to="/" onClick={() => setMenuOpen(false)}>Home</Link>
             <Link to="/categories" onClick={() => setMenuOpen(false)}>Categories</Link>
             {role === 'retailer' && <Link to="/b2b" onClick={() => setMenuOpen(false)}>B2B Portal</Link>}
+            {role === 'admin' && <Link to="/admin" onClick={() => setMenuOpen(false)}>Admin Panel</Link>}
             <Link to="/favorites" onClick={() => setMenuOpen(false)}>Favorites</Link>
             <Link to="/cart" onClick={() => setMenuOpen(false)}>Cart</Link>
             <Link to="/checkout" onClick={() => setMenuOpen(false)}>Checkout</Link>
             {user ? (
-              <button onClick={() => { setMenuOpen(false); signOut() }}>Logout</button>
+              <>
+                <Link to="/profile" onClick={() => setMenuOpen(false)}>Profile</Link>
+                <Link to="/orders" onClick={() => setMenuOpen(false)}>Orders</Link>
+                <button onClick={async () => { 
+                  setMenuOpen(false)
+                  await signOut()
+                  navigate('/login')
+                }}>Logout</button>
+              </>
             ) : (
               <>
                 <Link to="/login" onClick={() => setMenuOpen(false)}>Login</Link>

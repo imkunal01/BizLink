@@ -12,6 +12,8 @@ const createOrder = async (req, res) => {
       return res.status(400).json({ message: "Cart is empty" });
     }
 
+    const isRetailer = req.user.role === "retailer";
+
     // calculate total
     let total = 0;
     const orderItems = [];
@@ -20,8 +22,25 @@ const createOrder = async (req, res) => {
       if (!product) return res.status(404).json({ message: "Product not found" });
       if (product.stock < item.qty) return res.status(400).json({ message: `${product.name} is out of stock` });
 
-      total += item.qty * product.price;
-      orderItems.push({ product: product._id, name: product.name, qty: item.qty, price: product.price });
+      // Pricing logic: use bulk price for retailers if quantity meets minimum
+      let unitPrice = product.price;
+      if (isRetailer) {
+        if (item.qty >= product.min_bulk_qty && product.price_bulk) {
+          unitPrice = product.price_bulk;
+        } else {
+          unitPrice = product.retailer_price || product.price;
+        }
+      }
+
+      // Validate minimum quantity for bulk orders
+      if (isRetailer && product.min_bulk_qty > 0 && item.qty < product.min_bulk_qty && product.price_bulk) {
+        return res.status(400).json({ 
+          message: `${product.name} requires minimum quantity of ${product.min_bulk_qty} for bulk pricing` 
+        });
+      }
+
+      total += item.qty * unitPrice;
+      orderItems.push({ product: product._id, name: product.name, qty: item.qty, price: unitPrice });
       product.stock -= item.qty;
       await product.save();
     }
@@ -33,6 +52,7 @@ const createOrder = async (req, res) => {
       paymentMethod: paymentMethod || "COD",
       paymentStatus: paymentMethod === "COD" ? "pending" : "pending",
       shippingAddress,
+      isBulkOrder: isRetailer,
     });
 
     // Clear cart immediately for COD orders
@@ -46,14 +66,16 @@ const createOrder = async (req, res) => {
 
     // send email confirmation (simple)
     try {
+      const orderType = isRetailer ? "Bulk Order" : "Order";
       await sendMail({
         to: req.user.email,
-        subject: "Order Placed Successfully",
+        subject: `${orderType} Placed Successfully`,
         html: `<h3>Hey ${req.user.name},</h3>
-         <p>Your order (#${order._id}) has been placed successfully!</p>
+         <p>Your ${orderType.toLowerCase()} (#${order._id}) has been placed successfully!</p>
          <p>Total Amount: ₹${total}</p>
          <p>Payment Method: ${paymentMethod}</p>
-         <p>We’ll notify you once it’s shipped 🚚</p>`
+         ${isRetailer ? '<p><strong>Bulk Order - Special Wholesale Pricing Applied</strong></p>' : ''}
+         <p>We'll notify you once it's shipped 🚚</p>`
       });
     } catch (e) {
       console.warn("Email send failed:", e.message);
@@ -73,6 +95,28 @@ const getMyOrders = async (req, res) => {
       .populate("items.product", "name price images")
       .sort({ createdAt: -1 });
     res.json(orders);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// 👤 Get single order by ID (user's own order)
+const getOrderById = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id)
+      .populate("items.product", "name price images description")
+      .populate("user", "name email phone");
+    
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    
+    // Verify that the order belongs to the logged-in user
+    if (order.user._id.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+    
+    res.json(order);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -121,6 +165,7 @@ const deleteOrder = async (req, res) => {
 module.exports = {
   createOrder,
   getMyOrders,
+  getOrderById,
   getAllOrders,
   updateOrderStatus,
   deleteOrder,

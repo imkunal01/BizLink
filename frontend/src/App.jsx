@@ -12,6 +12,9 @@ import ProductDetails from './pages/ProductDetails.jsx'
 import CartPage from './pages/CartPage.jsx'
 import CheckoutPage from './pages/CheckoutPage.jsx'
 import SuccessScreen from './pages/SuccessScreen.jsx'
+import ProfilePage from './pages/ProfilePage.jsx'
+import OrdersPage from './pages/OrdersPage.jsx'
+import OrderDetailsPage from './pages/OrderDetailsPage.jsx'
 
 function App() {
   return (
@@ -25,6 +28,9 @@ function App() {
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/success/:orderId" element={<SuccessScreen />} />
+        <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+        <Route path="/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
+        <Route path="/orders/:id" element={<ProtectedRoute><OrderDetailsPage /></ProtectedRoute>} />
         <Route path="/b2b" element={<ProtectedRoute allow={['retailer']}><B2B /></ProtectedRoute>} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />

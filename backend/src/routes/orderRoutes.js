@@ -9,6 +9,7 @@ const validate = require("../middleware/validate");
 router.post("/", protect, orderCreateValidation, validate, orderController.createOrder);
 router.get("/my", protect, orderController.getMyOrders);
 router.get("/", protect, adminOnly, orderController.getAllOrders);
+router.get("/:id", protect, orderController.getOrderById);
 router.put("/:id/status", protect, adminOnly, orderController.updateOrderStatus);
 router.delete("/:id", protect, adminOnly, orderController.deleteOrder);
 

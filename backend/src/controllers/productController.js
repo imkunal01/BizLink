@@ -210,7 +210,8 @@ async function getRetailerProducts(req, res) {
     }
 
     const products = await Product.find({ active: true })
-      .select("name images stock retailer_price price_bulk min_bulk_qty");
+      .select("name description images stock price retailer_price price_bulk min_bulk_qty Category tags")
+      .populate("Category", "name slug");
 
     res.json({ success: true, data: products });
   } catch (err) {

@@ -23,11 +23,12 @@ function loadRazorpayScript() {
 
 export default function CheckoutPage() {
   const { cart, removeFromCart } = useContext(ShopContext)
-  const { token, user } = useContext(AuthContext)
+  const { token, user, role } = useContext(AuthContext)
   const [address, setAddress] = useState({})
   const [method, setMethod] = useState('COD')
   const [placing, setPlacing] = useState(false)
   const navigate = useNavigate()
+  const isRetailer = role === 'retailer'
 
   const itemsPayload = useMemo(() => cart.map(i => ({ product: i.productId, qty: i.qty })), [cart])
   const empty = cart.length === 0
@@ -98,7 +99,21 @@ export default function CheckoutPage() {
     <div>
       <Navbar />
       <div style={{ maxWidth: 960, margin: '24px auto', padding: '0 16px' }}>
-        <h2>Checkout</h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <h2 style={{ margin: 0 }}>Checkout</h2>
+          {isRetailer && (
+            <span style={{ 
+              padding: '6px 12px', 
+              backgroundColor: '#dbeafe', 
+              color: '#1e40af', 
+              borderRadius: '12px', 
+              fontSize: '14px',
+              fontWeight: '500'
+            }}>
+              B2B Bulk Order
+            </span>
+          )}
+        </div>
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16 }}>
           <div style={{ display: 'grid', gap: 16 }}>
             <div style={{ border: '1px solid #e2e8f0', borderRadius: 12, padding: 16 }}>

@@ -4,6 +4,16 @@ const generateRefreshToken = require('../utils/generateRefreshToken');
 const jwt = require('jsonwebtoken');
 const https = require('https');
 
+// Cookie options for refresh token – must work cross-origin (Vercel ↔ Render)
+const refreshCookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    // For different frontend/backend domains we need SameSite=None
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    path: '/',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+};
+
 const registerUser = async (req, res)=>{
     try {
         const { name, email, password, role } = req.body;
@@ -19,13 +29,7 @@ const registerUser = async (req, res)=>{
         if (user) {
             const access = generateToken(user._id, user.role, user.tokenVersion)
             const refresh = generateRefreshToken(user._id, user.tokenVersion)
-            res.cookie('refreshToken', refresh, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                path: '/',
-                maxAge: 7 * 24 * 60 * 60 * 1000
-            })
+            res.cookie('refreshToken', refresh, refreshCookieOptions)
             res.status(201).json({
                 _id: user._id,
                 name: user.name,
@@ -52,13 +56,7 @@ const loginUser = async (req, res)=>{
         if (user && (await user.matchPassword(password))) {
             const access = generateToken(user._id, user.role, user.tokenVersion)
             const refresh = generateRefreshToken(user._id, user.tokenVersion)
-            res.cookie('refreshToken', refresh, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                path: '/',
-                maxAge: 7 * 24 * 60 * 60 * 1000
-            })
+            res.cookie('refreshToken', refresh, refreshCookieOptions)
             res.json({
                 _id: user._id,
                 name: user.name,
@@ -197,13 +195,7 @@ const googleAuth = async (req, res) => {
         }
         const access = generateToken(user._id, user.role, user.tokenVersion)
         const refresh = generateRefreshToken(user._id, user.tokenVersion)
-        res.cookie('refreshToken', refresh, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            path: '/',
-            maxAge: 7 * 24 * 60 * 60 * 1000
-        })
+        res.cookie('refreshToken', refresh, refreshCookieOptions)
         res.json({ _id: user._id, name: user.name, email: user.email, role: user.role, token: access })
     } catch (e) {
         res.status(500).json({ message: e.message })

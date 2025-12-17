@@ -13,6 +13,32 @@ function parseJwt(token) {
 
 const AuthContext = createContext(null)
 
+const STORAGE_KEY = 'auth'
+
+function loadStoredAuth() {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY)
+    if (!raw) return null
+    return JSON.parse(raw)
+  } catch {
+    return null
+  }
+}
+
+function saveStoredAuth(auth) {
+  if (typeof window === 'undefined') return
+  try {
+    if (!auth || !auth.token) {
+      window.localStorage.removeItem(STORAGE_KEY)
+    } else {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(auth))
+    }
+  } catch {
+    // ignore storage errors (Safari private mode, etc.)
+  }
+}
+
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(null)
   const [user, setUser] = useState(null)
@@ -38,11 +64,19 @@ export function AuthProvider({ children }) {
       scheduleRefresh(accessToken)
       const meRes = await apiProfile(accessToken)
       setUser(meRes?.data || null)
+      const storedRole = parseJwt(accessToken)?.role || null
+      setRole(storedRole)
+      saveStoredAuth({
+        token: accessToken,
+        user: meRes?.data || null,
+        role: storedRole,
+      })
       return true
     }
     setToken(null)
     setUser(null)
     setRole(null)
+    saveStoredAuth(null)
     return false
   }
 
@@ -53,6 +87,11 @@ export function AuthProvider({ children }) {
     setUser({ _id: payload._id, name: payload.name, email: payload.email, role: payload.role })
     setRole(payload.role)
     await scheduleRefresh(payload.token)
+    saveStoredAuth({
+      token: payload.token,
+      user: { _id: payload._id, name: payload.name, email: payload.email, role: payload.role },
+      role: payload.role,
+    })
     return payload
   }
 
@@ -63,6 +102,11 @@ export function AuthProvider({ children }) {
     setUser({ _id: payload._id, name: payload.name, email: payload.email, role: payload.role })
     setRole(payload.role)
     await scheduleRefresh(payload.token)
+    saveStoredAuth({
+      token: payload.token,
+      user: { _id: payload._id, name: payload.name, email: payload.email, role: payload.role },
+      role: payload.role,
+    })
     return payload
   }
 
@@ -72,11 +116,25 @@ export function AuthProvider({ children }) {
     setUser(null)
     setRole(null)
     if (refreshTimer.current) clearTimeout(refreshTimer.current)
+     saveStoredAuth(null)
   }
 
   useEffect(() => {
     if (initialized.current) return
     initialized.current = true
+    // 1) Synchronously hydrate from localStorage so deep links don't
+    //    immediately redirect on hard refresh.
+    const stored = loadStoredAuth()
+    if (stored?.token) {
+      setToken(stored.token)
+      setUser(stored.user || null)
+      setRole(stored.role || null)
+      scheduleRefresh(stored.token)
+    }
+
+    // 2) Then validate/refresh token from backend.
+    //    Until this finishes, `loading` stays true and ProtectedRoute
+    //    will show a loading screen instead of redirecting.
     refreshAccess().finally(() => setLoading(false))
     return () => { if (refreshTimer.current) clearTimeout(refreshTimer.current) }
   }, [])

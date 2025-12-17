@@ -87,10 +87,84 @@ app.use("/api/reviews", require("./routes/reviewRoutes"));
 /* =========================
    HEALTH CHECK
 ========================= */
+// health check with good styled message
 
-app.get("/", (req, res) => {
-  res.send("Smart E-Commerce Backend Running ✅");
-});
+  const os = require("os");
+
+  app.get("/", (req, res) => {
+    // Compute memory usage
+    const memUsageMB = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2);
+    // Compute CPU usage
+    const cpuUsageMs = (process.cpuUsage().user / 1000).toFixed(2);
+    // Environment
+    const env = process.env.NODE_ENV || "development";
+    // Get port
+    const port = process.env.PORT || 5000;
+    // Try to get DB string
+    const dbStr = process.env.MONGO_URI ? "****" + process.env.MONGO_URI.slice(-8) : "(not set)";
+    // Uptime (rounded)
+    const uptime = process.uptime().toFixed(0);
+
+    // Try to get network addresses safely
+    const ifaces = os.networkInterfaces();
+    const addrs = [];
+    for (let key in ifaces) {
+      ifaces[key].forEach(i => {
+        if (i.family === "IPv4" && !i.internal) addrs.push(i.address);
+      });
+    }
+
+    // HTML Response
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8" />
+          <title>Smart E-Commerce Backend Health</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              background-color: #f0f0f0;
+              color: #333;
+              text-align: center;
+              padding-top: 40px;
+            }
+            .box {
+              display: inline-block;
+              background: #fff;
+              border-radius: 10px;
+              padding: 32px 48px 32px 48px;
+              box-shadow: 0 2px 24px 0 #0002;
+              text-align: left;
+            }
+            h1 { color: #2196f3; }
+            .kv { margin: 0.4em 0;}
+            .label { font-weight: bold; }
+          </style>
+        </head>
+        <body>
+          <div class="box">
+            <h1>Smart E-Commerce Backend Running ✅</h1>
+            <p class="kv"><span class="label">Version:</span> 1.0.0</p>
+            <p class="kv"><span class="label">Environment:</span> ${env}</p>
+            <p class="kv"><span class="label">Database:</span> ${dbStr}</p>
+            <p class="kv"><span class="label">Port:</span> ${port}</p>
+            <p class="kv"><span class="label">Server Time:</span> ${new Date().toISOString()}</p>
+            <p class="kv"><span class="label">Uptime:</span> ${uptime} seconds</p>
+            <p class="kv"><span class="label">Memory Usage:</span> ${memUsageMB} MB</p>
+            <p class="kv"><span class="label">CPU Usage:</span> ${cpuUsageMs} ms</p>
+            <p class="kv"><span class="label">Network Address(es):</span> ${addrs.length ? addrs.join(", ") : "?"}</p>
+          </div>
+          <script>
+            setTimeout(() => {
+              window.location.reload();
+            }, 10000);
+          </script>
+        </body>
+      </html>
+    `);
+  });
+
 
 /* =========================
    ERROR HANDLER

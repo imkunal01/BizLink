@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import Navbar from '../components/Navbar.jsx'
 import Footer from '../components/Footer.jsx'
-import './'
+import './SuccessScreen.css'
 
 export default function SuccessScreen() {
   const { orderId } = useParams()

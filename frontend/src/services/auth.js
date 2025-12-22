@@ -13,7 +13,7 @@ export async function logout() {
 }
 
 export async function refresh() {
-  return apiFetch('/api/auth/refresh', { method: 'POST', noThrow: true })
+  return apiFetch('/api/auth/refresh', { method: 'POST', noThrow: true, credentials: 'include' })
 }
 
 export async function profile(token) {

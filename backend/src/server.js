@@ -13,6 +13,9 @@ connectDB();
 
 const app = express();
 
+// Trust proxy for Render/Vercel to correctly identify protocol (http vs https)
+app.set('trust proxy', 1);
+
 /* =========================
    CORS CONFIG (INLINE)
 ========================= */
@@ -25,13 +28,15 @@ const corsOptions = {
       "http://localhost:3000",
       "http://localhost:5173",
       "http://localhost:5174",
-      "https://kripa-connect-app.vercel.app"
+      "https://kripa-connect-app.vercel.app",
+      "https://kripaconnect-app.onrender.com"
     ];
 
-    if (allowedOrigins.includes(origin)) {
+    if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
       return callback(null, true);
     }
 
+    console.log("Blocked by CORS:", origin); // Debug log
     return callback(new Error("Not allowed by CORS"));
   },
   credentials: true,

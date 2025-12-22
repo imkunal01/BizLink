@@ -1,0 +1,98 @@
+.sort-dd {
+  position: relative;
+  display: inline-block;
+  min-width: 200px;
+}
+
+/* main button */
+.sort-dd-btn {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-size: .95rem;
+  font-weight: 500;
+  color: #111827;
+
+  cursor: pointer;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.sort-dd-btn:hover {
+  border-color: #9ca3af;
+}
+
+.sort-dd-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37,99,235,.15);
+}
+
+/* arrow */
+.chev {
+  transition: transform .2s ease;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.chev.up {
+  transform: rotate(180deg);
+}
+
+/* dropdown menu */
+.sort-dd-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 100%;
+
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+
+  box-shadow: 0 20px 40px rgba(0,0,0,.12);
+  z-index: 20;
+  overflow: hidden;
+}
+
+/* dropdown items */
+.sort-dd-item {
+  width: 100%;
+  padding: 12px 14px;
+  background: transparent;
+  border: none;
+  text-align: left;
+
+  font-size: .9rem;
+  color: #111827;
+  cursor: pointer;
+
+  transition: background .15s ease;
+}
+
+.sort-dd-item:hover {
+  background: #f3f4f6;
+}
+
+/* active */
+.sort-dd-item.active {
+  background: #eff6ff;
+  color: #2563eb;
+  font-weight: 600;
+}
+
+/* mobile */
+@media (max-width: 600px) {
+  .sort-dd {
+    width: 100%;
+  }
+
+  .sort-dd-btn {
+    font-size: 1rem;
+  }
+}

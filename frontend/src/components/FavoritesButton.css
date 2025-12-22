@@ -1,0 +1,53 @@
+.wish-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 12px 18px;
+
+  background: rgba(255,255,255,0.35);
+  backdrop-filter: blur(10px);
+
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 12px;
+
+  font-size: 15px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition:
+    background .25s ease,
+    border-color .25s ease,
+    transform .15s ease;
+}
+
+.wish-btn:hover {
+  background: rgba(255,255,255,0.55);
+  border-color: rgba(0,0,0,0.12);
+  transform: translateY(-1px);
+}
+
+.wish-active {
+  background: rgba(255, 100, 120, 0.18);
+  border-color: rgba(255, 100, 120, 0.35);
+}
+
+.wish-icon {
+  font-size: 19px;
+}
+
+.wish-text {
+  letter-spacing: .1px;
+}
+
+/* tap bounce */
+.wish-pop {
+  animation: wishBounce .28s ease;
+}
+
+@keyframes wishBounce {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.07); }
+  100% { transform: scale(1); }
+}

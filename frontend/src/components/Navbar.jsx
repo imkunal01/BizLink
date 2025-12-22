@@ -56,19 +56,18 @@ export default function Navbar() {
           MOBILE SEARCH FULLSCREEN
       ======================== */}
       <div className={`mobile-search-overlay ${mobileSearchOpen ? 'open' : ''}`}>
-        <div style={{ width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-             <h3 style={{ margin: 0 }}>Search</h3>
-             <button type="button" onClick={() => setMobileSearchOpen(false)} style={{ background: 'none', border: 'none', padding: 10 }}>
+        <div className="mobile-search-inner">
+          <div className="mobile-search-header">
+             <h3 className="mobile-search-title">Search</h3>
+             <button type="button" onClick={() => setMobileSearchOpen(false)} className="mobile-search-close">
                 <Icons.X />
              </button>
           </div>
-          <form onSubmit={onSearch} style={{ display: 'flex', gap: '0.5rem' }}>
+          <form onSubmit={onSearch} className="mobile-search-form">
             <input 
-              className="desk-search-input" 
+              className="mobile-search-input" 
               placeholder="Search products..." 
               value={q} 
-              style={{ background: '#f1f5f9' }}
               onChange={e => setQ(e.target.value)}
               autoFocus={mobileSearchOpen}
             />
@@ -115,7 +114,7 @@ export default function Navbar() {
          <div className="floating-pill">
            {/* Copy your Desktop code from previous step here, it remains valid */}
            <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-             <Link to="/" className="desk-logo">KripaConnect<div className="brand-dot"/></Link>
+             <Link to="/" className="desk-logo">KC<div className="brand-dot"/></Link>
              <div className="nav-links">
                <Link to="/" className={`nav-link ${isActive('/') ? 'active' : ''}`}>Home</Link>
                <Link to="/products" className={`nav-link ${isActive('/products') ? 'active' : ''}`}>Products</Link>

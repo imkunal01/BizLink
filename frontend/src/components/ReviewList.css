@@ -1,0 +1,104 @@
+.review-list.sleek {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 10px;
+}
+
+/* each review row */
+.review-row {
+  display: flex;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.4);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.45);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+}
+
+/* avatar */
+.review-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(200,200,200,0.35);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 600;
+  font-size: 18px;
+  backdrop-filter: blur(12px);
+}
+
+/* content block */
+.review-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.review-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.review-user {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+/* badge */
+.review-badge {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(100,100,100,0.15);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* stars */
+.review-stars {
+  display: flex;
+  gap: 2px;
+  margin-top: 2px;
+}
+
+.star {
+  font-size: 16px;
+  color: rgba(180,180,180,0.6);
+}
+
+.star.filled {
+  color: #facc15;
+}
+
+/* text */
+.review-text {
+  font-size: 14px;
+  line-height: 1.45;
+  margin-top: 4px;
+}
+
+/* date */
+.review-date {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+/* divider line */
+.review-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.5);
+  margin-top: 10px;
+}
+
+/* empty message */
+.review-empty {
+  opacity: 0.6;
+  padding: 20px;
+  text-align: center;
+}

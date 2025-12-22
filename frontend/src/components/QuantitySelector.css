@@ -1,0 +1,50 @@
+    .qty-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.4);
+  backdrop-filter: blur(8px);
+  padding: 6px 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(0,0,0,0.08);
+}
+
+.qty-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  border: none;
+
+  font-size: 17px;
+  font-weight: 600;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0,0,0,0.05);
+  cursor: pointer;
+
+  transition: transform .15s ease, background .2s ease;
+}
+
+.qty-btn:not(:disabled):hover {
+  background: rgba(0,0,0,0.1);
+  transform: translateY(-1px);
+}
+
+.qty-btn:disabled {
+  opacity: .3;
+  cursor: not-allowed;
+}
+
+.qty-input {
+  width: 42px;
+  text-align: center;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 2px;
+  outline: none;
+}

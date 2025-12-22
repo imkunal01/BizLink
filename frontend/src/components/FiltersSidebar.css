@@ -1,104 +1,206 @@
-/* Filters Sidebar Component Styles */
+/* FiltersSidebar.css */
 
-.filters-sidebar {
-  width: 100%;
-  max-width: 280px;
-  border-right: 1px solid #e2e8f0;
-  padding-right: 1rem;
-  padding-bottom: 1rem;
+:root {
+  --filter-bg: #ffffff;
+  --filter-border: #e5e7eb;
+  --filter-text-main: #111827;
+  --filter-text-muted: #6b7280;
+  --filter-input-bg: #f9fafb;
+  --filter-accent: #000000;
+  --filter-radius: 8px;
+  --filter-transition: 0.2s ease;
 }
 
+.filters-sidebar {
+  width: 280px; /* Adjust based on your layout */
+  background-color: var(--filter-bg);
+  padding: 24px;
+  border-right: 1px solid var(--filter-border);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  box-sizing: border-box;
+}
+
+/* --- Groups --- */
 .filters-group {
-  margin-bottom: 1rem;
+  margin-bottom: 28px;
 }
 
 .filters-label {
+  font-size: 0.875rem; /* 14px */
   font-weight: 600;
-  margin-bottom: 0.5rem;
-  font-size: 0.875rem;
-  color: #374151;
+  color: var(--filter-text-main);
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
 }
 
-.filters-select {
+/* --- Inputs & Selects Shared Styles --- */
+.filters-select,
+.filters-price-input {
   width: 100%;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  border: 1px solid #e2e8f0;
-  font-size: 16px;
-  min-height: 44px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  color: var(--filter-text-main);
+  background-color: var(--filter-input-bg);
+  border: 1px solid var(--filter-border);
+  border-radius: var(--filter-radius);
+  outline: none;
+  transition: all var(--filter-transition);
+  box-sizing: border-box;
+  appearance: none; /* Removes default OS styling */
 }
 
+/* Add a custom arrow for selects to keep it minimal */
+.filters-select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+.filters-select:focus,
+.filters-price-input:focus {
+  border-color: var(--filter-text-muted);
+  background-color: #fff;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+}
+
+/* --- Price Inputs Layout --- */
 .filters-price-inputs {
   display: flex;
-  gap: 0.5rem;
+  gap: 12px;
+  align-items: center;
 }
 
-.filters-price-input {
-  flex: 1;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  border: 1px solid #e2e8f0;
-  font-size: 16px;
-  min-height: 44px;
-}
-
+/* --- Brand Checkboxes --- */
 .filters-brands-list {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.5rem;
-  max-height: 200px;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 300px;
+  overflow-y: hidden;
+  /* Custom thin scrollbar */
+
 }
 
 .filters-brand-item {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  border-radius: 0.375rem;
+  gap: 10px;
   cursor: pointer;
-  min-height: 44px;
-  transition: background-color 0.2s;
-}
-
-.filters-brand-item:hover {
-  background-color: #f3f4f6;
+  user-select: none;
 }
 
 .filters-brand-checkbox {
+  appearance: none;
   width: 18px;
   height: 18px;
+  border: 1px solid var(--filter-border);
+  border-radius: 4px;
+  background-color: #fff;
   cursor: pointer;
+  position: relative;
+  transition: all var(--filter-transition);
+  margin: 0;
+}
+
+.filters-brand-checkbox:checked {
+  background-color: var(--filter-accent);
+  border-color: var(--filter-accent);
+}
+
+/* Checkmark using pseudo-element */
+.filters-brand-checkbox:checked::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 
 .filters-brand-label {
-  font-size: 0.875rem;
-  color: #374151;
+  font-size: 0.9rem;
+  color: var(--filter-text-muted);
+  transition: color var(--filter-transition);
 }
 
+.filters-brand-item:hover .filters-brand-label {
+  color: var(--filter-text-main);
+}
+
+/* --- Apply Button --- */
 .filters-apply-button {
   width: 100%;
-  padding: 0.875rem;
-  background-color: #2563eb;
-  color: white;
+  padding: 12px;
+  margin-top: 10px;
+  background-color: var(--filter-text-main);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 500;
   border: none;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  font-size: 1rem;
+  border-radius: var(--filter-radius);
   cursor: pointer;
-  min-height: 44px;
-  transition: all 0.2s;
+  transition: all var(--filter-transition);
 }
 
 .filters-apply-button:hover {
-  background-color: #1e40af;
+  background-color: #000;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* Responsive Styles */
-@media (max-width: 767px) {
-  .filters-sidebar {
-    border-right: none;
-    padding-right: 0;
-    max-width: 100%;
-  }
+.filters-apply-button:active {
+  transform: translateY(0);
+}
+.filters-select {
+  width: 100%;
+  padding: 10px 12px;
+  padding-right: 30px; /* Make room for the arrow */
+  font-size: 0.9rem;
+  color: var(--filter-text-main);
+  background-color: var(--filter-input-bg);
+  border: 1px solid var(--filter-border);
+  border-radius: var(--filter-radius);
+  outline: none;
+  cursor: pointer;
+  
+  /* REMOVE default browser styles */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  /* Custom minimalist arrow SVG */
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 10px center;
+  background-repeat: no-repeat;
+  background-size: 1.2em 1.2em;
+  
+  transition: all var(--filter-transition);
+}
+
+.filters-select:hover {
+  border-color: #d1d5db; /* Slightly darker grey on hover */
+  background-color: #ffffff; /* Light up background on hover */
+}
+
+.filters-select:focus {
+  border-color: var(--filter-text-main); /* Black border when active */
+  background-color: #ffffff;
+  box-shadow: 0 0 0 1px var(--filter-text-main); /* Sharp focus ring */
+}
+.filters-select option {
+  background-color: #ffffff;
+  color: var(--filter-text-main);
+  padding: 12px;
+  font-size: 0.9rem;
+}
+
+/* Disabled options (if you ever have them) */
+.filters-select option:disabled {
+  color: var(--filter-text-muted);
 }

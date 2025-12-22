@@ -14,6 +14,8 @@ export default function Products() {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [filtersOpen, setFiltersOpen] = useState(false)
+  
+  // Extract params
   const search = params.get('search') || ''
   const category = params.get('category') || ''
   const minPrice = params.get('minPrice') || ''
@@ -22,12 +24,15 @@ export default function Products() {
   const brand = params.get('brand') || ''
   const availability = params.get('availability') || ''
 
+  // Data Fetching
   useEffect(() => {
     const t = setTimeout(() => {
       ;(async () => {
         setLoading(true)
         try {
-          const data = await listProducts({ search, category, minPrice, maxPrice, sort, brand, availability, limit: 24 })
+          const data = await listProducts({ 
+            search, category, minPrice, maxPrice, sort, brand, availability, limit: 24 
+          })
           setItems(data.items || [])
         } finally {
           setLoading(false)
@@ -37,13 +42,13 @@ export default function Products() {
     return () => clearTimeout(t)
   }, [search, category, minPrice, maxPrice, sort, brand, availability])
 
+  // Extract Brands
   const brandOptions = useMemo(() => {
     const tags = items.flatMap(p => Array.isArray(p.tags) ? p.tags : [])
     return Array.from(new Set(tags))
   }, [items])
 
-  const filteredItems = items
-
+  // Helper to update URL params
   function updateParams(next) {
     const merged = new URLSearchParams(params)
     Object.entries(next).forEach(([k, v]) => {
@@ -54,77 +59,91 @@ export default function Products() {
   }
 
   return (
-    <div className="products-page">
+    <div className="page-wrapper">
       <Navbar />
-      <div className="products-container">
-        {/* Mobile Filters Button */}
-        <button
-          onClick={() => setFiltersOpen(true)}
-          className="mobile-filters-btn"
-        >
-          <span>🔍</span> Filters
-        </button>
+      
+      {/* Header Section */}
+      <header className="page-header">
+        <div className="header-content">
+          <h1 className="page-title">Explore Collection</h1>
+          <p className="page-subtitle">Curated premium electronics for your workspace.</p>
+        </div>
+      </header>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr',
-          gap: '1.5rem'
-        }} className="products-layout">
-          {/* Desktop Sidebar */}
-          <div className="desktop-filters">
-            <FiltersSidebar params={{ category, min: minPrice, max: maxPrice, availability, brand }} onChange={updateParams} brandOptions={brandOptions} />
+      <div className="container main-layout">
+        
+        {/* Sidebar - Desktop */}
+        <aside className="sidebar-desktop">
+          <div className="sticky-wrapper">
+            <FiltersSidebar 
+              params={{ category, min: minPrice, max: maxPrice, availability, brand }} 
+              onChange={updateParams} 
+              brandOptions={brandOptions} 
+            />
           </div>
+        </aside>
 
-          {/* Mobile Filters Overlay */}
-          {filtersOpen && (
-            <div
-              onClick={() => setFiltersOpen(false)}
-              className="mobile-filters-overlay"
+        {/* Product Area */}
+        <main className="product-feed">
+          
+          {/* Controls Bar */}
+          <div className="controls-bar">
+            <button 
+              className="btn-filter-mobile"
+              onClick={() => setFiltersOpen(true)}
             >
-              <div
-                className="mobile-filters-panel"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="mobile-filters-header">
-                  <h3 className="mobile-filters-title">Filters</h3>
-                  <button
-                    onClick={() => setFiltersOpen(false)}
-                    className="mobile-filters-close"
-                  >
-                    ✕
-                  </button>
-                </div>
-                <FiltersSidebar params={{ category, min: minPrice, max: maxPrice, availability, brand }} onChange={updateParams} brandOptions={brandOptions} />
-              </div>
-            </div>
-          )}
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+              <span>Filters</span>
+            </button>
 
-          <div className="products-main">
-            <div className="products-controls">
-              <div className="products-search-wrapper">
-                <SearchBar value={search} onChange={(val) => updateParams({ search: val })} />
-              </div>
+            <div className="search-container">
+              <SearchBar value={search} onChange={(val) => updateParams({ search: val })} />
+            </div>
+            
+            <div className="sort-container">
               <SortBar value={sort} onChange={(val) => updateParams({ sort: val })} />
             </div>
-            {loading ? (
-              <div className="products-loading">
-                <div className="products-loading-icon">⏳</div>
-                <p style={{ color: '#6b7280' }}>Loading products...</p>
-              </div>
-            ) : filteredItems.length === 0 ? (
-              <div className="products-empty-state">
-                <div className="products-empty-icon">🔍</div>
-                <h2 className="products-empty-title">No products found</h2>
-                <p className="products-empty-text">
-                  Try adjusting your filters or search terms
-                </p>
-              </div>
-            ) : (
-              <ProductGrid items={filteredItems} />
-            )}
+          </div>
+
+          {/* Grid Content */}
+          {loading ? (
+            <div className="loading-state">
+              <div className="spinner"></div>
+              <span>Loading products...</span>
+            </div>
+          ) : items.length === 0 ? (
+            <div className="empty-state">
+              <div className="empty-icon">🔍</div>
+              <h3>No matches found</h3>
+              <p>Try adjusting your search or filters to find what you're looking for.</p>
+              <button className="btn-reset" onClick={() => setParams({})}>Clear All Filters</button>
+            </div>
+          ) : (
+            <ProductGrid items={items} />
+          )}
+        </main>
+      </div>
+
+      {/* Mobile Filter Drawer Overlay */}
+      <div className={`drawer-overlay ${filtersOpen ? 'open' : ''}`} onClick={() => setFiltersOpen(false)}>
+        <div className="drawer-panel" onClick={e => e.stopPropagation()}>
+          <div className="drawer-header">
+            <h3>Filters</h3>
+            <button className="btn-close" onClick={() => setFiltersOpen(false)}>✕</button>
+          </div>
+          <div className="drawer-content">
+            <FiltersSidebar 
+              params={{ category, min: minPrice, max: maxPrice, availability, brand }} 
+              onChange={updateParams} 
+              brandOptions={brandOptions} 
+            />
+          </div>
+          <div className="drawer-footer">
+            <button className="btn-apply" onClick={() => setFiltersOpen(false)}>Show Results</button>
           </div>
         </div>
       </div>
+
       <Footer />
     </div>
   )

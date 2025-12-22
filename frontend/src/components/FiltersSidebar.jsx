@@ -3,7 +3,7 @@ import { listCategories } from '../services/categories'
 import './FiltersSidebar.css'
 
 export default function FiltersSidebar({ params, onChange, brandOptions }) {
-  const [cats, setCats] = useState([])
+  const [cats, setCats] = useState([])  
   useEffect(() => { listCategories().then(setCats).catch(() => setCats([])) }, [])
 
   const [min, setMin] = useState(params.min || '')

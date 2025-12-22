@@ -11,133 +11,117 @@ export default function CartPage() {
   const { role } = useAuth()
   const navigate = useNavigate()
   const isRetailer = role === 'retailer'
-  
+
   const totals = useMemo(() => {
-    const subtotal = cart.reduce((sum, i) => sum + (Number(i.price) || 0) * (Number(i.qty) || 0), 0)
+    const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0)
     return { subtotal, total: subtotal }
   }, [cart])
 
-  const empty = cart.length === 0
-
   return (
-    <div className="cart-page">
+    <div className="cart-page-x">
       <Navbar />
-      <div className="cart-container">
-        <div className="cart-header">
-          <h1 className="cart-title">Shopping Cart</h1>
-          {isRetailer && (
-            <span className="cart-badge">B2B Wholesale Cart</span>
-          )}
-        </div>
 
-        {empty ? (
-          <div className="cart-empty-state">
-            <div className="cart-empty-icon">🛒</div>
-            <h2 className="cart-empty-title">Your cart is empty</h2>
-            <p className="cart-empty-text">
-              Start adding products to your cart to continue shopping
-            </p>
-            <Link to="/products" className="hero-cta-primary">
-              Shop Products
+      <main className="cart-wrapper">
+        <header className="cart-top">
+          <h1>Shopping Cart</h1>
+          <span>{cart.length} items</span>
+        </header>
+
+        {cart.length === 0 ? (
+          <div className="cart-empty-x">
+            <div className="empty-emoji">🛒</div>
+            <h2>Your cart is empty</h2>
+            <p>Add something beautiful to it</p>
+            <Link to="/products" className="empty-cta">
+              Browse Products →
             </Link>
           </div>
         ) : (
-          <div className="cart-layout">
-            {/* Cart Items */}
-            <div className="cart-items">
-              {cart.map(item => {
-                const isBulkPrice = isRetailer && item.isBulkPrice
-                const minQty = item.minBulkQty
-                return (
-                  <div key={item.productId} className="cart-item">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="cart-item-image"
-                    />
-                    <div className="cart-item-info">
-                      <h3 className="cart-item-name">{item.name}</h3>
-                      {isRetailer && (
-                        <div className="cart-item-price-info">
-                          {item.regularPrice && item.regularPrice !== item.price && (
-                            <span style={{ textDecoration: 'line-through', marginRight: '0.5rem', color: '#9ca3af' }}>
-                              ₹{item.regularPrice?.toLocaleString('en-IN')}
-                            </span>
-                          )}
-                          {isBulkPrice ? (
-                            <span style={{ color: '#10b981', fontWeight: '600' }}>
-                              Bulk Price: ₹{item.price?.toLocaleString('en-IN')} ✓
-                            </span>
-                          ) : (
-                            <span>Retailer Price: ₹{item.price?.toLocaleString('en-IN')}</span>
-                          )}
-                          {minQty && item.qty < minQty && (
-                            <div style={{ color: '#f59e0b', fontSize: '0.75rem', marginTop: '0.25rem', fontWeight: '500' }}>
-                              Min {minQty} for bulk pricing
-                            </div>
-                          )}
-                        </div>
+          <div className="cart-grid">
+            {/* LEFT – ITEMS */}
+            <section className="cart-items-x">
+              {cart.map(item => (
+                <div key={item.productId} className="cart-item-x">
+                  <img src={item.image} alt={item.name} />
+
+                  <div className="cart-mid">
+                    <h3>{item.name}</h3>
+
+                    <div className="price-row-x">
+                      <span className="price-main">
+                        ₹{item.price.toLocaleString('en-IN')}
+                      </span>
+
+                      {isRetailer && item.isBulkPrice && (
+                        <span className="bulk-pill">Bulk</span>
                       )}
-                      {!isRetailer && (
-                        <div className="cart-item-price">₹{(Number(item.price) || 0).toLocaleString('en-IN')}</div>
-                      )}
-                      <div className="cart-item-actions">
-                        <label className="cart-item-quantity-label">Qty:</label>
-                        <input
-                          type="number"
-                          min={isRetailer && minQty ? minQty : 1}
-                          value={item.qty}
-                          onChange={e => updateQty(item.productId, Math.max(isRetailer && minQty ? minQty : 1, Number(e.target.value) || 1))}
-                          className="cart-item-quantity-input"
-                        />
-                        <button
-                          onClick={() => removeFromCart(item.productId)}
-                          className="cart-item-remove-btn"
-                        >
-                          Remove
-                        </button>
-                      </div>
                     </div>
-                    <div className="cart-item-total">
-                      <div className="cart-item-total-price">
-                        ₹{(item.price * item.qty).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                      </div>
-                      {isBulkPrice && (
-                        <div className="cart-item-bulk-badge">Bulk pricing</div>
-                      )}
+
+                    {/* 🔥 NEW QUANTITY COUNTER */}
+                    <div className="qty-control-x">
+                      <button
+                        disabled={item.qty <= 1}
+                        onClick={() =>
+                          updateQty(item.productId, Math.max(1, item.qty - 1))
+                        }
+                      >
+                        –
+                      </button>
+
+                      <span>{item.qty}</span>
+
+                      <button
+                        onClick={() =>
+                          updateQty(item.productId, item.qty + 1)
+                        }
+                      >
+                        +
+                      </button>
                     </div>
                   </div>
-                )
-              })}
-            </div>
 
-            {/* Order Summary */}
-            <div className="order-summary-sticky">
-              <div className="order-summary-card">
-                <h2 className="order-summary-title">Order Summary</h2>
-                <div className="order-summary-row">
-                  <span>Subtotal</span>
-                  <span>₹{totals.subtotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
+                  <div className="cart-right">
+                    <div className="line-total-x">
+                      ₹{(item.price * item.qty).toLocaleString('en-IN')}
+                    </div>
+
+                    <button
+                      className="remove-x"
+                      onClick={() => removeFromCart(item.productId)}
+                    >
+                      Remove
+                    </button>
+                  </div>
                 </div>
-                <div className="order-summary-divider" />
-                <div className="order-summary-total">
-                  <span>Total</span>
-                  <span>₹{totals.total.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
-                </div>
-                <button
-                  onClick={() => navigate('/checkout')}
-                  disabled={empty}
-                  className="order-summary-button"
-                >
-                  Proceed to Checkout
-                </button>
+              ))}
+            </section>
+
+            {/* RIGHT – SUMMARY */}
+            <aside className="summary-x">
+              <h2>Order Summary</h2>
+
+              <div className="sum-row">
+                <span>Subtotal</span>
+                <span>₹{totals.subtotal.toLocaleString('en-IN')}</span>
               </div>
-            </div>
+
+              <div className="sum-row total">
+                <span>Total</span>
+                <span>₹{totals.total.toLocaleString('en-IN')}</span>
+              </div>
+
+              <button
+                className="checkout-x"
+                onClick={() => navigate('/checkout')}
+              >
+                Checkout →
+              </button>
+            </aside>
           </div>
         )}
-      </div>
+      </main>
+
       <Footer />
     </div>
   )
 }
-

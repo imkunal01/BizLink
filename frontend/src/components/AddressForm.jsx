@@ -1,17 +1,75 @@
+import './AddressForm.css'   // ⭐ CSS import
+
 export default function AddressForm({ value, onChange, disabled }) {
   const v = value || {}
-  function set(k, val) { onChange({ ...v, [k]: val }) }
+
+  function setField(key, val) {
+    onChange({ ...v, [key]: val })
+  }
+
   return (
-    <div style={{ display: 'grid', gap: 8 }}>
-      <input placeholder="Full Name" value={v.name || ''} onChange={e => set('name', e.target.value)} disabled={disabled} />
-      <input placeholder="Phone" value={v.phone || ''} onChange={e => set('phone', e.target.value)} disabled={disabled} />
-      <input placeholder="Address Line" value={v.addressLine || ''} onChange={e => set('addressLine', e.target.value)} disabled={disabled} />
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-        <input placeholder="City" value={v.city || ''} onChange={e => set('city', e.target.value)} disabled={disabled} />
-        <input placeholder="State" value={v.state || ''} onChange={e => set('state', e.target.value)} disabled={disabled} />
+    <div className="address-form">
+      <div className="field">
+        <label>Full Name</label>
+        <input
+          value={v.name || ''}
+          onChange={e => setField('name', e.target.value)}
+          disabled={disabled}
+          placeholder="John Doe"
+        />
       </div>
-      <input placeholder="Pincode" value={v.pincode || ''} onChange={e => set('pincode', e.target.value)} disabled={disabled} />
+
+      <div className="field">
+        <label>Phone Number</label>
+        <input
+          value={v.phone || ''}
+          onChange={e => setField('phone', e.target.value)}
+          disabled={disabled}
+          placeholder="9876543210"
+        />
+      </div>
+
+      <div className="field">
+        <label>Address</label>
+        <input
+          value={v.addressLine || ''}
+          onChange={e => setField('addressLine', e.target.value)}
+          disabled={disabled}
+          placeholder="House no, Street, Area"
+        />
+      </div>
+
+      <div className="field-row">
+        <div className="field">
+          <label>City</label>
+          <input
+            value={v.city || ''}
+            onChange={e => setField('city', e.target.value)}
+            disabled={disabled}
+            placeholder="Indore"
+          />
+        </div>
+
+        <div className="field">
+          <label>State</label>
+          <input
+            value={v.state || ''}
+            onChange={e => setField('state', e.target.value)}
+            disabled={disabled}
+            placeholder="Madhya Pradesh"
+          />
+        </div>
+      </div>
+
+      <div className="field">
+        <label>Pincode</label>
+        <input
+          value={v.pincode || ''}
+          onChange={e => setField('pincode', e.target.value)}
+          disabled={disabled}
+          placeholder="452001"
+        />
+      </div>
     </div>
   )
 }
-

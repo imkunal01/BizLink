@@ -22,7 +22,7 @@ const registerUser = async (req, res)=>{
             res.cookie('refreshToken', refresh, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
                 path: '/',
                 maxAge: 7 * 24 * 60 * 60 * 1000
             })
@@ -56,7 +56,7 @@ const loginUser = async (req, res)=>{
             res.cookie('refreshToken', refresh, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
                 path: '/',
                 maxAge: 7 * 24 * 60 * 60 * 1000
             })
@@ -146,7 +146,11 @@ const logoutUser = async (req, res) => {
             }
         }
     } catch (_) {}
-    res.clearCookie('refreshToken', { path: '/' })
+    res.clearCookie('refreshToken', {
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+    })
     res.status(200).json({ message: 'Logged out' })
 }
 
@@ -205,7 +209,7 @@ const googleAuth = async (req, res) => {
         res.cookie('refreshToken', refresh, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
             path: '/',
             maxAge: 7 * 24 * 60 * 60 * 1000
         })

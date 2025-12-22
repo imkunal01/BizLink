@@ -11,11 +11,8 @@ export default function Dashboard() {
   const { user, role } = useAuth()
   const navigate = useNavigate()
   
-  // Auth Redirect Logic
   useEffect(() => {
-    if (user && role === 'admin') {
-      navigate('/admin', { replace: true })
-    }
+    if (user && role === 'admin') navigate('/admin', { replace: true })
   }, [user, role, navigate])
 
   const [categories, setCategories] = useState([])
@@ -46,94 +43,95 @@ export default function Dashboard() {
     if (query) navigate(`/products?search=${encodeURIComponent(query)}`)
   }
 
+  // Helper to assign a specific pastel class based on index
+  const getCardColor = (index) => {
+    const colors = ['card-blue', 'card-mint', 'card-peach', 'card-lavender'];
+    return colors[index % colors.length];
+  }
+
   return (
-    <div className="modern-dashboard">
+    <div className="pop-dashboard">
       <Navbar />
 
-      <main className="main-content">
-        {/* Modern Split Hero */}
-        <header className="brand-hero">
-          <div className="hero-backdrop" />
-          <div className="container hero-layout">
-            <div className="hero-text">
-              <span className="badge-new">New Collection 2024</span>
-              <h1>Next Gen <span className="text-gradient">Tech</span></h1>
-              <p>Upgrade your setup with the world's most advanced electronics. Fast shipping, authenticated quality.</p>
+      <main className="pop-container">
+        {/* --- Hero: Asymmetric Bento Grid --- */}
+        <section className="hero-bento">
+          <div className="hero-main card-lavender">
+            <div className="hero-content">
+              <span className="pill-tag">🚀 New Arrivals</span>
+              <h1>Tech that <br/> <span>Pops.</span></h1>
+              <p>Curated electronics for the modern creator. Find your flow with our latest collection.</p>
               
-              <form onSubmit={handleSearch} className="search-bar-wrapper">
+              <form onSubmit={handleSearch} className="bento-search">
                 <input 
                   type="text" 
                   name="search" 
-                  placeholder="What are you looking for?" 
+                  placeholder="Search headphones, keyboards..." 
                   autoComplete="off"
                 />
-                <button type="submit" aria-label="Search">
-                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <button type="submit">
+                  <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
                 </button>
               </form>
             </div>
-            
-            {/* Abstract visual decoration */}
-            <div className="hero-visual">
-              <div className="glass-card float-animation">
-                <div className="icon-box">⚡</div>
-                <div>
-                  <strong>Fast Delivery</strong>
-                  <small>Within 24 Hours</small>
-                </div>
-              </div>
-              <div className="circle-blur"></div>
-            </div>
+            <div className="hero-decoration">✨</div>
           </div>
-        </header>
 
-        {/* Horizontal Category Rail */}
-        <section className="section-container">
-          <div className="section-header">
-            <h3>Explore Categories</h3>
-            <Link to="/categories" className="link-subtle">View All &rarr;</Link>
+          <div className="hero-side card-mint">
+            <h3>Fast Shipping</h3>
+            <p>Free delivery on orders over ₹999</p>
+            <div className="emoji-icon">🚚</div>
           </div>
-          
-          <div className="category-rail">
-            {loading ? (
-              <div className="skeleton-pill"></div>
-            ) : (
-              categories.map(c => (
-                <Link key={c._id} to={`/products?category=${c._id}`} className="category-pill">
-                  <span className="cat-emoji">📦</span>
-                  <span>{c.name}</span>
-                </Link>
-              ))
-            )}
+
+          <div className="hero-side card-peach">
+            <h3>Warranty</h3>
+            <p>100% Authentic Guarantee</p>
+            <div className="emoji-icon">🛡️</div>
           </div>
         </section>
 
-        {/* Masonry-style Product Grid */}
-        <section className="section-container bg-offset">
+        {/* --- Categories: Colorful Pills --- */}
+        <section className="section-block">
           <div className="section-header">
-            <h3>Trending Now</h3>
-            <Link to="/products" className="btn-outline">Shop All</Link>
+            <h2>Categories</h2>
+            <Link to="/categories" className="btn-link">See All →</Link>
+          </div>
+          
+          <div className="category-scroll">
+            {loading ? <div className="skeleton-box"></div> : categories.map((c, i) => (
+              <Link key={c._id} to={`/products?category=${c._id}`} className={`cat-card ${getCardColor(i)}`}>
+                <span className="cat-name">{c.name}</span>
+                <div className="cat-arrow">↘</div>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* --- Trending: Grid with Soft Colored Backgrounds --- */}
+        <section className="section-block">
+          <div className="section-header">
+            <h2>Fresh Drops</h2>
+            <Link to="/products" className="btn-black">Shop All</Link>
           </div>
 
-          <div className="product-grid-modern">
-            {loading ? <p>Loading deals...</p> : trending.map(p => (
-              <Link key={p._id} to={`/product/${p._id}`} className="modern-card">
-                <div className="card-image-container">
+          <div className="product-masonry">
+            {loading ? <p>Loading...</p> : trending.map((p, i) => (
+              <Link key={p._id} to={`/product/${p._id}`} className="product-pop-card">
+                <div className={`img-container ${getCardColor(i + 2)}`}> {/* Offset index for variety */}
                   {p.images?.[0]?.url ? (
-                    <img src={p.images[0].url} alt={p.name} loading="lazy" />
+                    <img src={p.images[0].url} alt={p.name} />
                   ) : (
-                    <div className="placeholder-img">📷</div>
+                    <div className="placeholder">📷</div>
                   )}
-                  <div className="card-overlay">
-                    <span className="btn-view">View Details</span>
-                  </div>
+                  <span className="price-tag">₹{p.price?.toLocaleString('en-IN')}</span>
                 </div>
-                <div className="card-details">
-                  <div className="card-meta">
-                    <h4>{p.name}</h4>
-                    <span className="price">₹{p.price?.toLocaleString('en-IN')}</span>
+                
+                <div className="pop-details">
+                  <h4>{p.name}</h4>
+                  <div className="pop-meta">
+                    <span className="category-label">{p.category?.name || 'Gear'}</span>
+                    <button className="btn-add">+</button>
                   </div>
-                  <small className="category-tag">Electronics</small>
                 </div>
               </Link>
             ))}

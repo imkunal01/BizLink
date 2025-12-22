@@ -11,7 +11,7 @@ exports.getOverview = async (req, res) => {
     const lowStock = await Product.countDocuments({ stock: { $lt: 10 } });
 
     const revenueAgg = await Order.aggregate([
-      { $match: { paymentStatus: "paid" } },
+      { $match: { deliveryStatus: "delivered" } },
       { $group: { _id: null, totalRevenue: { $sum: "$totalAmount" } } },
     ]);
 
@@ -34,7 +34,7 @@ exports.getOverview = async (req, res) => {
 exports.getRevenueStats = async (req, res) => {
   try {
     const revenue = await Order.aggregate([
-      { $match: { paymentStatus: "paid" } },
+      { $match: { deliveryStatus: "delivered" } },
       {
         $group: {
           _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },

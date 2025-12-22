@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
-import { getOrderById } from '../services/orders'
+import ShopContext from '../context/ShopContext'
+import { getOrderById, cancelOrder } from '../services/orders'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import OrderTimeline from '../components/OrderTimeline'
@@ -21,6 +22,7 @@ function formatDate(dateString) {
 export default function OrderDetailsPage() {
   const { id } = useParams()
   const { token } = useAuth()
+  const { addToCart } = useContext(ShopContext)
   const navigate = useNavigate()
   const [order, setOrder] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -47,6 +49,36 @@ export default function OrderDetailsPage() {
       console.error(err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function handleCancel() {
+    if (!window.confirm('Are you sure you want to cancel this order?')) return
+    try {
+      await cancelOrder(order._id, token)
+      await loadOrder()
+    } catch (err) {
+      alert(err.message || 'Failed to cancel order')
+    }
+  }
+
+  async function handleBuyAgain() {
+    try {
+      let count = 0
+      for (const item of order.items) {
+        if (item.product) {
+          await addToCart(item.product, item.qty)
+          count++
+        }
+      }
+      if (count > 0) {
+        navigate('/cart')
+      } else {
+        alert('Products are no longer available')
+      }
+    } catch (err) {
+      console.error(err)
+      alert('Failed to add items to cart')
     }
   }
 

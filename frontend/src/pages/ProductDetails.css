@@ -14,7 +14,6 @@
 .pdp-page {
   background-color: var(--pdp-bg);
   min-height: 100vh;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   color: var(--pdp-text);
   padding-bottom: 80px; /* Space for mobile FAB */
 }

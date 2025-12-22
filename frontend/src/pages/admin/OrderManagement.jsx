@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../hooks/useAuth'
-import { getAllOrdersAdmin, updateOrderStatus, getOrderByIdAdmin } from '../../services/admin'
+import { getAllOrdersAdmin, updateOrderStatus, getOrderByIdAdmin, deleteOrderAdmin } from '../../services/admin'
 import OrderTimeline from '../../components/OrderTimeline'
 
 const statusOptions = ['pending', 'shipped', 'delivered', 'cancelled']
@@ -64,6 +64,20 @@ export default function OrderManagement() {
       }
     } catch (err) {
       alert(err.message || 'Failed to update status')
+    }
+  }
+
+  async function handleDeleteOrder(orderId) {
+    if (window.confirm('Are you sure you want to delete this order? This action cannot be undone.')) {
+      try {
+        await deleteOrderAdmin(orderId, token)
+        await loadOrders()
+        if (selectedOrder && selectedOrder._id === orderId) {
+          setSelectedOrder(null)
+        }
+      } catch (err) {
+        alert(err.message || 'Failed to delete order')
+      }
     }
   }
 
@@ -301,6 +315,27 @@ export default function OrderManagement() {
                 <span>Total</span>
                 <span>₹{selectedOrder.totalAmount?.toLocaleString('en-IN')}</span>
               </div>
+            </div>
+
+            <div style={{ marginTop: '20px' }}>
+              <button
+                onClick={() => handleDeleteOrder(selectedOrder._id)}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  backgroundColor: '#fee2e2',
+                  color: '#991b1b',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#fecaca'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#fee2e2'}
+              >
+                Delete Order
+              </button>
             </div>
           </div>
         )}

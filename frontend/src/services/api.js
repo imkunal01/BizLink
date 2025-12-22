@@ -20,6 +20,9 @@ async function apiFetch(path, { method = 'GET', body, token, headers = {}, crede
     data = await res.text()
   }
   if (!res.ok) {
+    if (res.status === 401) {
+      window.dispatchEvent(new Event('auth:unauthorized'))
+    }
     if (noThrow) return { ok: false, status: res.status, data }
     const message = typeof data === 'string' ? data : data?.message || 'Request failed'
     const error = new Error(message)

@@ -27,6 +27,17 @@ const userSchema = new mongoose.Schema({
     isBlocked: { type: Boolean, default: false },
     tokenVersion: { type: Number, default: 0 },
     favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
+    savedAddresses: [
+        {
+            name: String,
+            phone: String,
+            addressLine: String,
+            city: String,
+            state: String,
+            pincode: String,
+            default: { type: Boolean, default: false }
+        }
+    ],
     cart: [
         {
             product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },

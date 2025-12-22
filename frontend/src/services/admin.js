@@ -15,7 +15,7 @@ export async function getRevenueStats(token) {
 
 export async function getOrderStats(token) {
   const res = await apiFetch('/api/analytics/orders', { token })
-  return res.data || []
+  return (res.data && res.data.data) || (Array.isArray(res.data) ? res.data : [])
 }
 
 export async function getTopProducts(token) {

@@ -1,192 +1,254 @@
-.auth-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+:root {
+  --auth-bg: #ffffff;
+  --auth-text: #0f172a;
+  --auth-muted: #64748b;
+  --auth-border: #e5e7eb;
+  --auth-shadow: 0 10px 25px -10px rgba(0,0,0,0.15);
+  --primary: #2563eb;
+  --accent: #8b5cf6;
+  --danger: #ef4444;
 }
 
-.input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.input-group label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #333;
+.auth-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+  background: #f3f4f6;
+  padding: 16px;
 }
 
-.input-wrapper {
+.auth-left {
+  background: var(--auth-bg);
+  border-radius: 28px 0 0 28px;
+  padding: 48px 56px;
+  color: var(--auth-text);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 24px;
+  box-shadow: var(--auth-shadow);
+}
+
+.auth-right {
   position: relative;
-  display: flex;
-  align-items: center;
-}
-.input-wrapper input {
-  width: 100%;
-  padding: 12px 12px 12px 40px; /* space for icon */
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  font-size: 0.95rem;
-  background: #f8fafc;
-  transition: all 0.2s;
-  color: #333;
-}
-.input-wrapper input:focus {
-  border-color: #38b000;
-  background: white;
-  box-shadow: 0 0 0 3px rgba(56, 176, 0, 0.1);
-  outline: none;
-}
-
-.input-icon {
-  position: absolute;
-  left: 12px;
-  color: #94a3b8;
-  font-size: 1rem;
-}
-
-.eye-btn {
-  position: absolute;
-  right: 12px;
-  background: none;
-  padding: 0;
-  color: #94a3b8;
+  border-radius: 0 28px 28px 0;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-.eye-btn:hover {
-  color: #64748b;
+  box-shadow: var(--auth-shadow);
 }
 
-.error-text {
-  font-size: 0.8rem;
-  color: #ef4444;
-}
-.error-banner {
-  padding: 12px;
-  background: #fef2f2;
-  border: 1px solid #fee2e2;
-  color: #ef4444;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  text-align: center;
-}
-
-/* Checkbox Custom Styling */
-.form-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.checkbox-container {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.9rem;
-  color: #64748b;
-  cursor: pointer;
-  position: relative;
-  user-select: none;
-}
-.checkbox-container input {
-  position: absolute;
-  opacity: 0;
-  cursor: pointer;
-  height: 0;
-  width: 0;
-}
-.checkmark {
-  height: 18px;
-  width: 18px;
-  background-color: #fff;
-  border: 1px solid #cbd5e1;
-  border-radius: 4px;
-  position: relative;
-}
-.checkbox-container:hover .checkmark {
-  border-color: #94a3b8;
-}
-.checkbox-container input:checked ~ .checkmark {
-  background-color: #38b000;
-  border-color: #38b000;
-}
-.checkmark:after {
+.auth-right::before {
   content: "";
   position: absolute;
-  display: none;
-  left: 6px;
-  top: 2px;
-  width: 3px;
-  height: 8px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
-}
-.checkbox-container input:checked ~ .checkmark:after {
-  display: block;
+  inset: 0;
+  background: radial-gradient(900px 600px at 70% 30%, rgba(139,92,246,0.8), transparent 60%),
+              radial-gradient(800px 500px at 40% 70%, rgba(37,99,235,0.8), transparent 60%),
+              linear-gradient(120deg, #1f2937 0%, #111827 100%);
 }
 
-/* Submit Button */
-.submit-btn {
-  width: 100%;
-  padding: 14px;
-  border-radius: 12px;
-  background: linear-gradient(90deg, #38b000 0%, #22c55e 100%);
-  color: white;
-  font-weight: 600;
-  font-size: 1rem;
-  margin-top: 10px;
-  transition: all 0.2s;
-  box-shadow: 0 4px 12px rgba(56, 176, 0, 0.2);
-}
-.submit-btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(56, 176, 0, 0.3);
-}
-.submit-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-/* Role Toggle Redesign */
-.role-select-container {
+.right-actions {
+  position: absolute;
+  top: 24px;
+  right: 24px;
   display: flex;
-  gap: 16px;
-  margin-bottom: 8px;
+  gap: 12px;
+  z-index: 2;
 }
-.role-card {
-  flex: 1;
+
+.pill-btn {
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  background: transparent;
+  color: #ffffff;
+  border: 1.5px solid rgba(255,255,255,0.6);
+  backdrop-filter: blur(6px);
+}
+.pill-btn.primary {
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.8);
+}
+
+.visual-content {
+  position: relative;
+  z-index: 2;
+  color: #e5e7eb;
+  max-width: 520px;
+  padding: 24px;
+}
+.visual-content h2 {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #fff;
+  margin-bottom: 12px;
+}
+.visual-content p {
+  color: #cbd5e1;
+  line-height: 1.7;
+}
+
+.auth-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.brand {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+.auth-toggle {
+  display: flex;
+  gap: 8px;
+}
+.toggle-btn {
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid var(--auth-border);
+  color: var(--auth-text);
+  background: #fff;
+  font-weight: 600;
+}
+.toggle-btn.active {
+  background: #111827;
+  color: #ffffff;
+  border-color: #111827;
+}
+
+.welcome-text h1 {
+  font-size: 4rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin: 8px 0;
+}
+.welcome-text p {
+  color: var(--auth-muted);
+  margin: 0;
+}
+
+.form-stack {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 16px;
-  border: 1px solid #e2e8f0;
+  gap: 14px;
+}
+
+.input-field {
+  height: 52px;
   border-radius: 12px;
-  background: white;
+  border: 1.4px solid var(--auth-border);
+  padding: 0 16px;
+  background: #ffffff;
+  color: var(--auth-text);
+  font-size: 0.95rem;
+  outline: none;
+}
+.input-field::placeholder {
+  color: #9ca3af;
+}
+.input-field:focus {
+  border-color: #111827;
+  box-shadow: 0 0 0 4px rgba(17,24,39,0.08);
+}
+
+.form-extras {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.9rem;
+}
+.link-reset {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.divider {
+  text-align: center;
+  color: var(--auth-muted);
+  font-size: 0.9rem;
+}
+
+.btn-primary {
+  height: 52px;
+  border-radius: 999px;
+  background: #111827;
+  color: #ffffff;
+  font-weight: 700;
+  border: none;
+}
+.btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn-google {
+  height: 52px;
+  border-radius: 12px;
+  border: 1.4px solid var(--auth-border);
+  background: #ffffff;
+  color: #111827;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.role-label {
+  display: block;
+  font-weight: 700;
+  color: var(--auth-text);
+  margin-bottom: 8px;
+}
+.role-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.role-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1.4px solid var(--auth-border);
+  height: 56px;
+  border-radius: 12px;
+  background: #fff;
+  color: var(--auth-text);
   cursor: pointer;
-  transition: all 0.2s;
 }
 .role-card.active {
-  border-color: #86efac; /* Green-300 */
-  background: #f0fdf4; /* Green-50 */
-  box-shadow: 0 0 0 2px #38b000;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(37,99,235,0.12);
+  color: var(--primary);
 }
-.role-card:hover:not(.active) {
-  border-color: #cbd5e1;
-  background: #f8fafc;
-}
-.role-icon {
-  font-size: 1.5rem;
-  color: #64748b;
-}
-.role-card.active .role-icon {
-  color: #166534;
-}
-.role-label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #333;
+
+@media (max-width: 768px) {
+  .auth-wrapper {
+    grid-template-columns: 1fr;
+    padding: 0;
+  }
+  .auth-left {
+    border-radius: 0;
+    padding: 28px 20px;
+    box-shadow: none;
+  }
+  .auth-right {
+    border-radius: 0;
+    min-height: 280px;
+    margin: 0 16px 16px;
+  }
+  .welcome-text h1 {
+    font-size: 2.5rem;
+  }
+  .right-actions {
+    top: 16px;
+    right: 16px;
+  }
 }

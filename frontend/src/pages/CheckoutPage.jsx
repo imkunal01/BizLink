@@ -9,7 +9,6 @@ import PaymentSelector from '../components/PaymentSelector.jsx'
 import OrderSummary from '../components/OrderSummary.jsx'
 import { createOrder } from '../services/orders'
 import { createRazorpayOrder, verifyPayment } from '../services/payments'
-import { useToast } from '../context/ToastContext.jsx'
 import './CheckoutPage.css'
 
 function loadRazorpayScript() {
@@ -26,14 +25,9 @@ function loadRazorpayScript() {
 export default function CheckoutPage() {
   const { cart, removeFromCart } = useContext(ShopContext)
   const { token, user, role } = useContext(AuthContext)
-  const toast = useToast()
   const [address, setAddress] = useState({})
   const [method, setMethod] = useState('COD')
   const [placing, setPlacing] = useState(false)
-  const [locationChecking, setLocationChecking] = useState(false)
-  const [serviceCity, setServiceCity] = useState('')
-  const [serviceAllowed, setServiceAllowed] = useState(true)
-  const [locationError, setLocationError] = useState('')
   const navigate = useNavigate()
   const isRetailer = role === 'retailer'
 
@@ -44,105 +38,13 @@ export default function CheckoutPage() {
     if (empty) navigate('/cart')
   }, [empty, navigate])
 
-  // Prefill address from saved data or user profile
-  useEffect(() => {
-    let base = {}
-    try {
-      const raw = window.localStorage.getItem('kc_checkout_address')
-      if (raw) base = JSON.parse(raw) || {}
-    } catch {
-      // ignore
-    }
-    if (user) {
-      base = {
-        ...base,
-        name: base.name || user.name || '',
-        phone: base.phone || user.phone || '',
-      }
-    }
-    setAddress((prev) => Object.keys(prev || {}).length ? prev : base)
-  }, [user])
-
-  // Persist address for future checkouts
-  useEffect(() => {
-    if (!address) return
-    try {
-      window.localStorage.setItem('kc_checkout_address', JSON.stringify(address))
-    } catch {
-      // ignore
-    }
-  }, [address])
-
-  const SERVICE_CITIES = ['Pachore'] // Allowed service areas (can be extended)
-
-  // Auto-detect user location (city) and enforce service area
-  useEffect(() => {
-    let cancelled = false
-    async function detectLocation() {
-      setLocationChecking(true)
-      setLocationError('')
-      try {
-        let city = address.city
-        if (!city && navigator.geolocation) {
-          await new Promise((resolve) => {
-            navigator.geolocation.getCurrentPosition(
-              async (pos) => {
-                try {
-                  const { latitude, longitude } = pos.coords
-                  const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`)
-                  const data = await res.json().catch(() => ({}))
-                  city = data.address?.city || data.address?.town || data.address?.village || ''
-                  resolve()
-                } catch {
-                  resolve()
-                }
-              },
-              () => resolve(),
-              { timeout: 5000 }
-            )
-          })
-        }
-        // Fallback: try IP-based lookup
-        if (!city) {
-          try {
-            const ipRes = await fetch('https://ipapi.co/json/')
-            const ipData = await ipRes.json().catch(() => ({}))
-            city = ipData.city || ''
-          } catch {
-            // ignore
-          }
-        }
-        if (cancelled) return
-        if (city) {
-          setAddress((prev) => ({ ...prev, city: prev.city || city }))
-          setServiceCity(city)
-          const allowed = SERVICE_CITIES.map(c => c.toLowerCase()).includes(city.toLowerCase())
-          setServiceAllowed(allowed)
-        }
-      } catch (e) {
-        if (!cancelled) setLocationError('Unable to auto-detect location')
-      } finally {
-        if (!cancelled) setLocationChecking(false)
-      }
-    }
-    detectLocation()
-    return () => { cancelled = true }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
   async function onPlaceOrder() {
     if (!address.name || !address.phone || !address.addressLine || !address.city || !address.state || !address.pincode) {
-      toast.error('Please fill delivery address')
-      return
-    }
-    const cityAllowed = SERVICE_CITIES.length === 0 ||
-      (address.city && SERVICE_CITIES.map(c => c.toLowerCase()).includes(address.city.toLowerCase()))
-    if (!cityAllowed) {
-      toast.error('Service not available in your city')
+      alert('Please fill delivery address')
       return
     }
     if (!method) {
-      toast.error('Please select a payment method')
+      alert('Please select a payment method')
       return
     }
     setPlacing(true)
@@ -152,7 +54,6 @@ export default function CheckoutPage() {
       if (method === 'COD') {
         // Clear local cart UI
         cart.forEach(i => removeFromCart(i.productId))
-        toast.success('Order placed successfully')
         navigate(`/success/${order._id}`)
         return
       }
@@ -189,7 +90,7 @@ export default function CheckoutPage() {
       const rp = new window.Razorpay(options)
       rp.open()
     } catch (err) {
-      toast.error(err.message || 'Order failed')
+      alert(err.message || 'Order failed')
     } finally {
       setPlacing(false)
     }
@@ -203,10 +104,6 @@ export default function CheckoutPage() {
   ]
 
   const isAddressComplete = address.name && address.phone && address.addressLine && address.city && address.state && address.pincode
-  const isServiceable = !address.city
-    ? serviceAllowed
-    : SERVICE_CITIES.length === 0 ||
-      SERVICE_CITIES.map(c => c.toLowerCase()).includes(address.city.toLowerCase())
 
   function handleNext() {
     if (currentStep === 1 && isAddressComplete) {
@@ -259,22 +156,30 @@ export default function CheckoutPage() {
             {currentStep === 1 && (
               <div className="checkout-step-card">
                 <h2 className="checkout-step-card-title">Delivery Address</h2>
+                
+                {user?.savedAddresses?.length > 0 && (
+                  <>
+                    <div className="saved-addresses-grid">
+                      {user.savedAddresses.map((addr, idx) => (
+                        <div 
+                          key={idx} 
+                          className={`saved-address-card ${JSON.stringify(address) === JSON.stringify(addr) ? 'selected' : ''}`}
+                          onClick={() => setAddress(addr)}
+                        >
+                          <h4>{addr.name}</h4>
+                          <p>{addr.addressLine}</p>
+                          <p>{addr.city}, {addr.state} - {addr.pincode}</p>
+                          <p>📞 {addr.phone}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="checkout-divider">
+                      <span>OR Enter New Address</span>
+                    </div>
+                  </>
+                )}
+
                 <AddressForm value={address} onChange={setAddress} disabled={placing} />
-                {!isServiceable && (
-                  <div className="checkout-service-warning">
-                    Service not available in your city. Please enter an address in our service area.
-                  </div>
-                )}
-                {locationChecking && (
-                  <div className="checkout-location-info">
-                    Detecting your location...
-                  </div>
-                )}
-                {locationError && (
-                  <div className="checkout-location-error">
-                    {locationError}
-                  </div>
-                )}
               </div>
             )}
 
@@ -327,8 +232,8 @@ export default function CheckoutPage() {
               ) : (
                 <button
                   onClick={onPlaceOrder}
-                  disabled={placing || empty || !isServiceable}
-                  className={`checkout-nav-button place-order ${(placing || empty || !isServiceable) ? 'disabled' : ''}`}
+                  disabled={placing || empty}
+                  className={`checkout-nav-button place-order ${(placing || empty) ? 'disabled' : ''}`}
                 >
                   {placing ? 'Placing Order...' : 'Place Order'}
                 </button>

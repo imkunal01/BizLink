@@ -13,7 +13,7 @@ export default function CartPage() {
   const isRetailer = role === 'retailer'
   
   const totals = useMemo(() => {
-    const subtotal = cart.reduce((sum, i) => sum + i.price * i.qty, 0)
+    const subtotal = cart.reduce((sum, i) => sum + (Number(i.price) || 0) * (Number(i.qty) || 0), 0)
     return { subtotal, total: subtotal }
   }, [cart])
 
@@ -79,7 +79,7 @@ export default function CartPage() {
                         </div>
                       )}
                       {!isRetailer && (
-                        <div className="cart-item-price">₹{item.price?.toLocaleString('en-IN')}</div>
+                        <div className="cart-item-price">₹{(Number(item.price) || 0).toLocaleString('en-IN')}</div>
                       )}
                       <div className="cart-item-actions">
                         <label className="cart-item-quantity-label">Qty:</label>

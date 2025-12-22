@@ -49,15 +49,32 @@ export function AuthProvider({ children }) {
 
   async function scheduleRefresh(accessToken) {
     if (refreshTimer.current) clearTimeout(refreshTimer.current)
-    // Access tokens expire in ~15m; refresh a bit earlier
-    const fifteenMinutes = 15 * 60 * 1000
-    refreshTimer.current = setTimeout(refreshAccess, Math.max(1, fifteenMinutes - 60 * 1000))
+    
     const payload = parseJwt(accessToken)
-    if (payload) setRole(payload.role)
+    if (!payload) return
+
+    setRole(payload.role)
+    
+    // Check expiry
+    const exp = payload.exp ? payload.exp * 1000 : Date.now() + 15 * 60 * 1000
+    const now = Date.now()
+    const timeLeft = exp - now
+    
+    // Refresh 1 minute before expiry, or immediately if close
+    const delay = Math.max(1000, timeLeft - 60 * 1000)
+    
+    console.log(`[Auth] Token check: Expires in ${Math.round(timeLeft/1000)}s. Next refresh in ${Math.round(delay/1000)}s`)
+    refreshTimer.current = setTimeout(refreshAccess, delay)
   }
 
   async function refreshAccess() {
-    const res = await apiRefresh().catch(() => null)
+    // catch network errors
+    const res = await apiRefresh().catch((err) => {
+      console.error("Token refresh network error:", err)
+      return null
+    })
+
+    // 1. Success case
     const accessToken = res?.data?.token
     if (accessToken) {
       setToken(accessToken)
@@ -73,10 +90,24 @@ export function AuthProvider({ children }) {
       })
       return true
     }
-    setToken(null)
-    setUser(null)
-    setRole(null)
-    saveStoredAuth(null)
+
+    // 2. Failure cases
+    // If res is null (network error) or status is 5xx, we might want to preserve the local session
+    // if it's still valid (e.g. not expired).
+    // However, if status is 401/403, it means the refresh token is invalid/expired -> Logout.
+    
+    if (res && (res.status === 401 || res.status === 403)) {
+      console.log("Session expired or invalid, logging out.")
+      setToken(null)
+      setUser(null)
+      setRole(null)
+      saveStoredAuth(null)
+      return false
+    }
+
+    // For other errors (network, 500), we keep the current state (from localStorage)
+    // assuming the access token might still be valid.
+    console.warn("Token refresh failed but not strictly unauthorized. Keeping local session if exists.", res?.status)
     return false
   }
 
@@ -137,6 +168,17 @@ export function AuthProvider({ children }) {
     //    will show a loading screen instead of redirecting.
     refreshAccess().finally(() => setLoading(false))
     return () => { if (refreshTimer.current) clearTimeout(refreshTimer.current) }
+  }, [])
+
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      setToken(null)
+      setUser(null)
+      setRole(null)
+      saveStoredAuth(null)
+    }
+    window.addEventListener('auth:unauthorized', handleUnauthorized)
+    return () => window.removeEventListener('auth:unauthorized', handleUnauthorized)
   }, [])
 
   const value = useMemo(() => ({ token, user, role, loading, signIn, signUp, signOut }), [token, user, role, loading])

@@ -14,3 +14,7 @@ export async function getOrderById(orderId, token) {
   return res.data
 }
 
+export async function cancelOrder(orderId, token) {
+  return apiFetch(`/api/orders/${orderId}/cancel`, { method: 'PUT', token })
+}
+

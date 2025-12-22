@@ -5,9 +5,19 @@ async function getCart(req, res) {
   try {
     const isRetailer = req.user.role === "retailer";
     const user = await User.findById(req.user._id).populate("cart.product", "name price images stock retailer_price price_bulk min_bulk_qty");
-    const items = (user?.cart || []).map(it => {
+    
+    // Filter out items where the product no longer exists (it.product is null)
+    const validItems = (user?.cart || []).filter(it => it.product && it.product._id);
+
+    // Auto-cleanup: If we found invalid items, remove them from the user's cart in DB
+    if (user.cart.length !== validItems.length) {
+      user.cart = validItems.map(it => ({ product: it.product._id, qty: it.qty }));
+      await user.save();
+    }
+    
+    const items = validItems.map(it => {
       const product = it.product;
-      let price = product?.price;
+      let price = product.price;
       
       // Use bulk pricing for retailers if quantity meets minimum
       if (isRetailer && product) {

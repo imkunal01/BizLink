@@ -1,93 +1,91 @@
 import { useState } from 'react'
-import { useNavigate, Link, useLocation } from 'react-router-dom'
-import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth.js'
-import AuthLayout from '../components/AuthLayout.jsx'
 import './FormStyles.css'
-
-function validateEmail(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-}
 
 export default function Login() {
   const { signIn } = useAuth()
   const navigate = useNavigate()
-  const location = useLocation()
-  const from = location.state?.from || '/'
   
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const valid = validateEmail(email) && password.length > 0
 
-  async function onSubmit(e) {
+  const handleLogin = async (e) => {
     e.preventDefault()
-    setError('')
     setLoading(true)
     try {
       await signIn({ email, password })
-      navigate(from)
+      navigate('/')
     } catch (err) {
-      setError(err?.message || 'Login failed')
+      alert("Login failed")
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <AuthLayout>
-      <form onSubmit={onSubmit} noValidate className="auth-form">
-        <div className="input-group">
-          <label>Email Address</label>
-          <div className="input-wrapper">
-            <FaEnvelope className="input-icon" />
-            <input 
-              type="email" 
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)} 
-              placeholder="you@example.com" 
-            />
+    <div className="auth-wrapper">
+      {/* LEFT: Form Section */}
+      <div className="auth-left">
+        <header className="auth-header">
+          <div className="brand">KARC</div>
+          <div className="auth-toggle">
+            <Link to="/login" className="toggle-btn active">Log In</Link>
+            <Link to="/signup" className="toggle-btn">Sign Up</Link>
           </div>
-          {!validateEmail(email) && email.length > 0 && <span className="error-text">Enter a valid email</span>}
+        </header>
+
+        <div className="welcome-text">
+          <h1>Hello!</h1>
+          <p>Welcome back to the community</p>
         </div>
 
-        <div className="input-group">
-          <label>Password</label>
-          <div className="input-wrapper">
-            <FaLock className="input-icon" />
-            <input 
-              type={showPassword ? "text" : "password"} 
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
-              placeholder="••••••••" 
-            />
-            <button 
-              type="button" 
-              className="eye-btn"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
-            </button>
+        <form onSubmit={handleLogin} className="form-stack">
+          <input 
+            className="input-field" 
+            type="email" 
+            placeholder="Email Address" 
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input 
+            className="input-field" 
+            type="password" 
+            placeholder="Password" 
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          
+          <div className="form-extras">
+            <label style={{display:'flex', gap:'8px', alignItems:'center', color:'#71717a', cursor:'pointer'}}>
+              <input type="checkbox" style={{width:'16px', height:'16px'}} /> Remember me
+            </label>
+            <Link to="/forgot-password" className="link-reset">Forgot Password?</Link>
           </div>
-        </div>
 
-        <div className="form-actions">
-          <label className="checkbox-container">
-            <input type="checkbox" />
-            <span className="checkmark"></span>
-            Remember me
-          </label>
-          <Link to="/forgot-password" style={{ color: '#38b000', fontSize: '0.9rem' }}>Forgot Password?</Link>
-        </div>
+          <button className="btn-primary" type="submit" disabled={loading}>
+            {loading ? 'Signing In...' : 'Log In'}
+          </button>
+        </form>
 
-        {error && <div className="error-banner">{error}</div>}
+        <div className="divider">or continue with</div>
 
-        <button className="submit-btn" type="submit" disabled={!valid || loading}>
-          {loading ? 'Signing In...' : 'Sign In'}
+        <button className="btn-google" onClick={() => alert("Trigger Google Auth")}>
+          <img src="https://www.svgrepo.com/show/475656/google-color.svg" width="20" alt="Google" />
+          Google
         </button>
-      </form>
-    </AuthLayout>
+      </div>
+
+      {/* RIGHT: Visual Section */}
+      <div className="auth-right">
+        <div className="visual-content">
+          <h2>Discover hidden gems.</h2>
+          <p>Join a community of explorers and creators sharing unique perspectives from around the globe.</p>
+        </div>
+      </div>
+    </div>
   )
 }

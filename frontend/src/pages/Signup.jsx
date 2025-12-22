@@ -1,146 +1,117 @@
 import { useState } from 'react'
-import { useNavigate, Link, useLocation } from 'react-router-dom'
-import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaStore, FaUserAlt } from 'react-icons/fa'
+import { Link, useNavigate } from 'react-router-dom'
+import { FaUserAlt, FaStore } from 'react-icons/fa'
 import { useAuth } from '../hooks/useAuth.js'
-import AuthLayout from '../components/AuthLayout.jsx'
 import './FormStyles.css'
-
-function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) }
-function passwordChecks(pwd) {
-  return {
-    length: pwd.length >= 8,
-    lower: /[a-z]/.test(pwd),
-    upper: /[A-Z]/.test(pwd),
-    number: /\d/.test(pwd),
-    symbol: /[\W_]/.test(pwd),
-  }
-}
 
 export default function Signup() {
   const { signUp } = useAuth()
   const navigate = useNavigate()
-  const location = useLocation()
-  const from = location.state?.from || '/'
-
+  
+  const [role, setRole] = useState('customer')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [role, setRole] = useState('customer')
-  const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  
-  const checks = passwordChecks(password)
-  const valid = name && validateEmail(email) && Object.values(checks).every(Boolean)
 
-  async function onSubmit(e) {
+  const handleSignup = async (e) => {
     e.preventDefault()
-    setError('')
     setLoading(true)
     try {
       await signUp({ name, email, password, role })
-      navigate(from)
+      navigate('/')
     } catch (err) {
-      setError(err?.message || 'Signup failed')
+      alert("Signup failed: " + err.message)
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <AuthLayout>
-      <form onSubmit={onSubmit} noValidate className="auth-form">
-        <div className="input-group">
-          <label>I am a</label>
-          <div className="role-select-container">
-            <div 
-              className={`role-card ${role === 'customer' ? 'active' : ''}`}
-              onClick={() => setRole('customer')}
-            >
-              <FaUserAlt className="role-icon" />
-              <span className="role-label">Customer</span>
-            </div>
-            <div 
-              className={`role-card ${role === 'retailer' ? 'active' : ''}`}
-              onClick={() => setRole('retailer')}
-            >
-              <FaStore className="role-icon" />
-              <span className="role-label">Retailer</span>
-            </div>
+    <div className="auth-wrapper">
+      {/* LEFT: Form Section */}
+      <div className="auth-left">
+        <header className="auth-header">
+          <div className="brand">KARC</div>
+          <div className="auth-toggle">
+            <Link to="/login" className="toggle-btn">Log In</Link>
+            <Link to="/signup" className="toggle-btn active">Sign Up</Link>
           </div>
+        </header>
+
+        <div className="welcome-text">
+          <h1>Create Account</h1>
+          <p>Start your journey with us today.</p>
         </div>
 
-        <div className="input-group">
-          <label>Full Name</label>
-          <div className="input-wrapper">
-            <FaUser className="input-icon" />
-            <input 
-              value={name} 
-              onChange={(e) => setName(e.target.value)} 
-              placeholder="John Doe" 
-            />
-          </div>
-        </div>
-
-        <div className="input-group">
-          <label>Email Address</label>
-          <div className="input-wrapper">
-            <FaEnvelope className="input-icon" />
-            <input 
-              type="email" 
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)} 
-              placeholder="you@example.com" 
-            />
-          </div>
-          {!validateEmail(email) && email.length > 0 && <span className="error-text">Enter a valid email</span>}
-        </div>
-
-        <div className="input-group">
-          <label>Password</label>
-          <div className="input-wrapper">
-            <FaLock className="input-icon" />
-            <input 
-              type={showPassword ? "text" : "password"} 
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
-              placeholder="••••••••" 
-            />
-            <button 
-              type="button" 
-              className="eye-btn"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
-            </button>
-          </div>
+        <form onSubmit={handleSignup} className="form-stack">
           
-          {/* Password Strength Indicators */}
-          <div style={{ fontSize: '0.8rem', color: '#666', marginTop: '8px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
-              <span style={{ color: checks.length ? '#22c55e' : '#94a3b8' }}>• 8+ chars</span>
-              <span style={{ color: checks.lower ? '#22c55e' : '#94a3b8' }}>• Lowercase</span>
-              <span style={{ color: checks.upper ? '#22c55e' : '#94a3b8' }}>• Uppercase</span>
-              <span style={{ color: checks.number ? '#22c55e' : '#94a3b8' }}>• Number</span>
-              <span style={{ color: checks.symbol ? '#22c55e' : '#94a3b8' }}>• Symbol</span>
+          {/* Role Selection */}
+          <div>
+            <label className="role-label">I am a:</label>
+            <div className="role-grid">
+              <div 
+                className={`role-card ${role === 'customer' ? 'active' : ''}`}
+                onClick={() => setRole('customer')}
+              >
+                <FaUserAlt style={{fontSize: '1.2rem'}} />
+                <span style={{fontSize: '0.9rem', fontWeight: '600'}}>Customer</span>
+              </div>
+              <div 
+                className={`role-card ${role === 'retailer' ? 'active' : ''}`}
+                onClick={() => setRole('retailer')}
+              >
+                <FaStore style={{fontSize: '1.2rem'}} />
+                <span style={{fontSize: '0.9rem', fontWeight: '600'}}>Retailer</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="form-actions">
-           <label className="checkbox-container">
-            <input type="checkbox" />
-            <span className="checkmark"></span>
-            I agree to Terms & Policy
-          </label>
-        </div>
+          <input 
+            className="input-field" 
+            type="text" 
+            placeholder="Full Name" 
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+          <input 
+            className="input-field" 
+            type="email" 
+            placeholder="Email Address" 
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input 
+            className="input-field" 
+            type="password" 
+            placeholder="Create Password" 
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
 
-        {error && <div className="error-banner">{error}</div>}
+          <button className="btn-primary" type="submit" disabled={loading}>
+            {loading ? 'Creating Account...' : 'Sign Up'}
+          </button>
+        </form>
 
-        <button className="submit-btn" type="submit" disabled={!valid || loading}>
-          {loading ? 'Creating Account...' : 'Create Account'}
+        <div className="divider">or continue with</div>
+
+        <button className="btn-google" onClick={() => alert("Trigger Google Auth")}>
+          <img src="https://www.svgrepo.com/show/475656/google-color.svg" width="20" alt="Google" />
+          Google
         </button>
-      </form>
-    </AuthLayout>
+      </div>
+
+      {/* RIGHT: Visual Section (Hidden on Mobile) */}
+      <div className="auth-right">
+        <div className="visual-content">
+          <h2>Start your journey.</h2>
+          <p>Create an account to unlock exclusive features, track your orders, and join our global community.</p>
+        </div>
+      </div>
+    </div>
   )
 }

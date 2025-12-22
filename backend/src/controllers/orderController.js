@@ -111,8 +111,8 @@ const getOrderById = async (req, res) => {
       return res.status(404).json({ message: "Order not found" });
     }
     
-    // Verify that the order belongs to the logged-in user
-    if (order.user._id.toString() !== req.user._id.toString()) {
+    // Verify that the order belongs to the logged-in user OR user is admin
+    if (order.user._id.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
       return res.status(403).json({ message: "Access denied" });
     }
     
@@ -162,6 +162,31 @@ const deleteOrder = async (req, res) => {
   }
 };
 
+// 👤 User – cancel order
+const cancelOrder = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: "Order not found" });
+
+    // Verify ownership
+    if (order.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    // Check if cancellable
+    if (order.deliveryStatus !== "pending") {
+      return res.status(400).json({ message: "Cannot cancel order that is already processed or shipped" });
+    }
+
+    order.deliveryStatus = "cancelled";
+    await order.save();
+    
+    res.json({ message: "Order cancelled successfully", order });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 module.exports = {
   createOrder,
   getMyOrders,
@@ -169,4 +194,5 @@ module.exports = {
   getAllOrders,
   updateOrderStatus,
   deleteOrder,
+  cancelOrder
 };

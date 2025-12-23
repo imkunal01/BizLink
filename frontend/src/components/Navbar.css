@@ -31,30 +31,52 @@ body {
    ========================================= */
 .navbar-top {
   position: fixed;
-  /* Float it down from the top edge/notch */
-  top: max(1rem, var(--safe-area-top)); 
+  top: max(1rem, var(--safe-area-top));
   left: 50%;
   transform: translateX(-50%);
   z-index: var(--z-navbar);
 
-  /* Same width constraints as bottom pill */
   width: 90%;
   max-width: 400px;
 
-  /* Glass Pill Style */
-  background: var(--bg-glass);
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+
   border-radius: var(--radius-pill);
   box-shadow: var(--shadow-pill);
 
-  /* Layout */
   padding: 0.75rem 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  /* IMPORTANT */
+  position: fixed;
+  background: rgba(255, 255, 255, 0.18);
+  overflow: hidden;
 }
+
+/* ✨ Apple-style glass border */
+.navbar-top::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.65),
+    rgba(255, 255, 255, 0.25),
+    rgba(255, 255, 255, 0.05)
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
 
 .brand-logo {
   font-size: 1.25rem; /* Slightly smaller to fit pill */
@@ -87,7 +109,7 @@ body {
   width: 90%;
   max-width: 400px;
   
-  background: var(--bg-glass);
+  /* background: var(--bg-glass); */
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
   border: 1px solid rgba(255, 255, 255, 0.6);
@@ -193,7 +215,7 @@ body {
   /* Reuse pill logic for desktop container */
   .floating-pill {
     pointer-events: auto;
-    background: rgba(255, 255, 255, 0.85);
+    /* background: rgba(255, 255, 255, 0.85); */
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255,255,255,0.6);

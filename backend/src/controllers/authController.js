@@ -5,12 +5,39 @@ const jwt = require('jsonwebtoken');
 const https = require('https');
 
 // Helper for cookie options
-const getCookieOptions = () => {
-    const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER;
+const getCookieOptions = (req) => {
+    // If we are on Render, force secure/none
+    if (process.env.RENDER || process.env.NODE_ENV === 'production') {
+        return {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none',
+            path: '/',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        };
+    }
+    
+    // Dynamic fallback for mixed environments
+    const origin = req?.headers?.origin || '';
+    const isLocal = origin.includes('localhost') || origin.includes('127.0.0.1');
+    
+    // If origin is localhost, use lax/insecure (or secure if https local)
+    // But usually localhost is http.
+    if (isLocal) {
+        return {
+            httpOnly: true,
+            secure: false, // http://localhost
+            sameSite: 'lax',
+            path: '/',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        };
+    }
+
+    // Default to secure/none for cross-site (e.g. Vercel -> Render)
     return {
         httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction ? 'none' : 'lax',
+        secure: true,
+        sameSite: 'none',
         path: '/',
         maxAge: 7 * 24 * 60 * 60 * 1000
     };
@@ -31,7 +58,7 @@ const registerUser = async (req, res)=>{
         if (user) {
             const access = generateToken(user._id, user.role, user.tokenVersion)
             const refresh = generateRefreshToken(user._id, user.tokenVersion)
-            res.cookie('refreshToken', refresh, getCookieOptions())
+            res.cookie('refreshToken', refresh, getCookieOptions(req))
             res.status(201).json({
                 _id: user._id,
                 name: user.name,
@@ -59,7 +86,7 @@ const loginUser = async (req, res)=>{
         if (user && (await user.matchPassword(password))) {
             const access = generateToken(user._id, user.role, user.tokenVersion)
             const refresh = generateRefreshToken(user._id, user.tokenVersion)
-            res.cookie('refreshToken', refresh, getCookieOptions())
+            res.cookie('refreshToken', refresh, getCookieOptions(req))
             res.json({
                 _id: user._id,
                 name: user.name,
@@ -144,13 +171,15 @@ const logoutUser = async (req, res) => {
             }
         }
     } catch (_) {}
-    res.clearCookie('refreshToken', getCookieOptions())
+    res.clearCookie('refreshToken', getCookieOptions(req))
     res.status(200).json({ message: 'Logged out' })
 }
 
 const refreshAccessToken = async (req, res) => {
     try {
         const token = req.cookies?.refreshToken
+        // Debug Log
+        console.log(`[Refresh] Origin: ${req.headers.origin}, Secure: ${req.secure}, Protocol: ${req.protocol}`);
         console.log(`[Refresh] Token present: ${!!token}, Cookies:`, Object.keys(req.cookies || {}));
         
         if (!token) return res.status(401).json({ message: 'Not authorized' })

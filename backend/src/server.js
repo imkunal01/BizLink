@@ -47,7 +47,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Enable preflight for all routes
 
 
 

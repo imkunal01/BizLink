@@ -2,10 +2,11 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { FaUserAlt, FaStore } from 'react-icons/fa'
 import { useAuth } from '../hooks/useAuth.js'
+import { useGoogleLogin } from '@react-oauth/google'
 import './FormStyles.css'
 
 export default function Signup() {
-  const { signUp } = useAuth()
+  const { signUp, googleSignIn } = useAuth()
   const navigate = useNavigate()
   
   const [role, setRole] = useState('customer')
@@ -13,6 +14,22 @@ export default function Signup() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+
+  const loginWithGoogle = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        await googleSignIn(null, tokenResponse.access_token, role);
+        navigate('/');
+      } catch (e) {
+        console.error(e);
+        alert("Google Signup Failed");
+      }
+    },
+    onError: () => {
+      console.log('Signup Failed');
+      alert("Google Signup Failed");
+    }
+  });
 
   const handleSignup = async (e) => {
     e.preventDefault()
@@ -99,7 +116,7 @@ export default function Signup() {
 
         <div className="divider">or continue with</div>
 
-        <button className="btn-google" onClick={() => alert("Trigger Google Auth")}>
+        <button className="btn-google" onClick={() => loginWithGoogle()}>
           <img src="https://www.svgrepo.com/show/475656/google-color.svg" width="20" alt="Google" />
           Google
         </button>

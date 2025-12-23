@@ -1,15 +1,32 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth.js'
+import { useGoogleLogin } from '@react-oauth/google'
 import './FormStyles.css'
 
 export default function Login() {
-  const { signIn } = useAuth()
+  const { signIn, googleSignIn } = useAuth()
   const navigate = useNavigate()
   
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+
+  const loginWithGoogle = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        await googleSignIn(null, tokenResponse.access_token);
+        navigate('/');
+      } catch (e) {
+        console.error(e);
+        alert("Google Login Failed");
+      }
+    },
+    onError: () => {
+      console.log('Login Failed');
+      alert("Google Login Failed");
+    }
+  });
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -73,7 +90,7 @@ export default function Login() {
 
         <div className="divider">or continue with</div>
 
-        <button className="btn-google" onClick={() => alert("Trigger Google Auth")}>
+        <button className="btn-google" onClick={() => loginWithGoogle()}>
           <img src="https://www.svgrepo.com/show/475656/google-color.svg" width="20" alt="Google" />
           Google
         </button>

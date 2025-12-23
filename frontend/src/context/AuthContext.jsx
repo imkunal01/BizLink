@@ -1,5 +1,5 @@
 import { createContext, useEffect, useMemo, useRef, useState } from 'react'
-import { login as apiLogin, signup as apiSignup, logout as apiLogout, refresh as apiRefresh, profile as apiProfile } from '../services/auth'
+import { login as apiLogin, signup as apiSignup, logout as apiLogout, refresh as apiRefresh, profile as apiProfile, googleLogin as apiGoogleLogin } from '../services/auth'
 
 function parseJwt(token) {
   try {
@@ -141,6 +141,21 @@ export function AuthProvider({ children }) {
     return payload
   }
 
+  async function googleSignIn(credential, accessToken, role) {
+    const res = await apiGoogleLogin(credential, accessToken, role)
+    const payload = res?.data || {}
+    setToken(payload.token)
+    setUser({ _id: payload._id, name: payload.name, email: payload.email, role: payload.role })
+    setRole(payload.role)
+    await scheduleRefresh(payload.token)
+    saveStoredAuth({
+      token: payload.token,
+      user: { _id: payload._id, name: payload.name, email: payload.email, role: payload.role },
+      role: payload.role,
+    })
+    return payload
+  }
+
   async function signOut() {
     await apiLogout().catch(() => {})
     setToken(null)
@@ -181,7 +196,7 @@ export function AuthProvider({ children }) {
     return () => window.removeEventListener('auth:unauthorized', handleUnauthorized)
   }, [])
 
-  const value = useMemo(() => ({ token, user, role, loading, signIn, signUp, signOut }), [token, user, role, loading])
+  const value = useMemo(() => ({ token, user, role, loading, signIn, signUp, signOut, googleSignIn }), [token, user, role, loading])
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 export default AuthContext

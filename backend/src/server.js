@@ -68,7 +68,11 @@ app.use(
 app.use(morgan("dev"));
 app.use(cookieParser());
 
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
+  })
+);
 app.use(apiLimiter);
 app.use(sanitizeRequest);
 

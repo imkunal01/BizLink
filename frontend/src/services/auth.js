@@ -16,6 +16,10 @@ export async function refresh() {
   return apiFetch('/api/auth/refresh', { method: 'POST', noThrow: true, credentials: 'include' })
 }
 
+export async function googleLogin(credential, accessToken, role) {
+  return apiFetch('/api/auth/google', { method: 'POST', body: { credential, accessToken, role } })
+}
+
 export async function profile(token) {
   return apiFetch('/api/auth/profile', { token })
 }

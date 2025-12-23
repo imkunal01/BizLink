@@ -132,8 +132,6 @@ const uploadProfilePhoto = async (req, res) => {
     }
 };
 
-
-module.exports = { registerUser, loginUser, getUserProfile };
 const logoutUser = async (req, res) => {
     try {
         const token = req.cookies?.refreshToken
@@ -185,19 +183,51 @@ function tokeninfo(idToken) {
     })
 }
 
+function fetchUserInfo(accessToken) {
+    return new Promise((resolve, reject) => {
+        const options = {
+            hostname: 'www.googleapis.com',
+            path: '/oauth2/v3/userinfo',
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        };
+        const req = https.request(options, (res) => {
+            let data = '';
+            res.on('data', (chunk) => { data += chunk; });
+            res.on('end', () => {
+                try { resolve(JSON.parse(data)); } catch (e) { reject(e); }
+            });
+        });
+        req.on('error', reject);
+        req.end();
+    });
+}
+
 const googleAuth = async (req, res) => {
     try {
-        const { credential } = req.body
-        if (!credential) return res.status(400).json({ message: 'Invalid request' })
-        const info = await tokeninfo(credential)
-        if (!info || info.aud !== process.env.GOOGLE_CLIENT_ID || info.email_verified !== 'true') {
-            return res.status(401).json({ message: 'Invalid token' })
+        const { credential, accessToken, role } = req.body
+        if (!credential && !accessToken) return res.status(400).json({ message: 'Invalid request' })
+        
+        let info;
+        if (credential) {
+            info = await tokeninfo(credential)
+            if (!info || info.aud !== process.env.GOOGLE_CLIENT_ID || info.email_verified !== 'true') {
+                return res.status(401).json({ message: 'Invalid token' })
+            }
+        } else if (accessToken) {
+            info = await fetchUserInfo(accessToken)
+            if (!info || !info.email_verified) {
+                return res.status(401).json({ message: 'Invalid access token' })
+            }
         }
+
         const email = info.email
         let user = await User.findOne({ email })
         if (!user) {
             const pwd = Math.random().toString(36).slice(-12)
-            user = await User.create({ name: info.name || email.split('@')[0], email, password: pwd, role: 'customer', profilePhoto: info.picture })
+            user = await User.create({ name: info.name || email.split('@')[0], email, password: pwd, role: role || 'customer', profilePhoto: info.picture })
         } else {
             if (!user.profilePhoto && info.picture) {
                 user.profilePhoto = info.picture

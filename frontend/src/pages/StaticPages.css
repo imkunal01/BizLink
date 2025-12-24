@@ -9,6 +9,7 @@
   --radius-lg: 16px;
   --radius-md: 12px;
   --radius-sm: 10px;
+
 }
 
 .static-page {
@@ -17,6 +18,7 @@
   flex-direction: column;
   background-color: var(--bg-page);
   background-image: radial-gradient(closest-side, #f8fafc, #ffffff);
+  color: #000;
 }
 
 .page-main {

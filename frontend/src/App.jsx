@@ -15,6 +15,14 @@ import SuccessScreen from './pages/SuccessScreen.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
 import OrdersPage from './pages/OrdersPage.jsx'
 import OrderDetailsPage from './pages/OrderDetailsPage.jsx'
+import About from './pages/About.jsx'
+import Services from './pages/Services.jsx'
+import FAQ from './pages/FAQ.jsx'
+import Contact from './pages/Contact.jsx'
+import Privacy from './pages/Privacy.jsx'
+import Terms from './pages/Terms.jsx'
+import Refund from './pages/Refund.jsx'
+import NotFound from './pages/NotFound.jsx'
 
 function App() {
   return (
@@ -37,9 +45,14 @@ function App() {
         <Route path="/admin" element={<ProtectedRoute allow={['admin']}><Admin /></ProtectedRoute>} />
         {/* Redirect legacy /dashboard to / for now, or keep it as an alias */}
         <Route path="/dashboard" element={<Navigate to="/" replace />} />
-        <Route path="/about" element={<div style={{ padding: 24 }}>About Kripa Connect</div>} />
-        <Route path="/contact" element={<div style={{ padding: 24 }}>Contact us at support@kripaconnect.example</div>} />
-        <Route path="/policy" element={<div style={{ padding: 24 }}>Privacy & Terms</div>} />
+        <Route path="/about" element={<About />} />
+        <Route path="/services" element={<Services />} />
+        <Route path="/faq" element={<FAQ />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/returns" element={<Refund />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
   )
